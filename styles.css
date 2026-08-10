@@ -1172,6 +1172,12 @@ body[data-error="gsap"]::before {
     font-size: 0.7rem;
   }
 
+  .desktop-screen.is-icons-pending .desktop-icon {
+    opacity: 0;
+    transform: translateX(-112px) scale(0.96);
+    pointer-events: none;
+  }
+
   .icon-glyph {
     width: 36px;
     height: 34px;

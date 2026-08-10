@@ -166,6 +166,41 @@
       });
     }
 
+    function revealDesktopIcons() {
+      if (desktop.classList.contains("is-icons-ready")) {
+        return;
+      }
+
+      const shouldSlideIn = window.matchMedia("(max-width: 560px)").matches;
+      desktop.classList.add("is-icons-ready");
+
+      if (!shouldSlideIn || prefersReducedMotion) {
+        desktop.classList.remove("is-icons-pending");
+        gsap.set(desktopIcons, { autoAlpha: 1, x: 0, scale: 1, pointerEvents: "auto" });
+        return;
+      }
+
+      gsap.set(desktopIcons, {
+        autoAlpha: 0,
+        x: -112,
+        scale: 0.96,
+        pointerEvents: "none",
+      });
+      desktop.classList.remove("is-icons-pending");
+
+      gsap.to(desktopIcons, {
+        autoAlpha: 1,
+        x: 0,
+        scale: 1,
+        pointerEvents: "auto",
+        duration: 0.52,
+        ease: "back.out(1.45)",
+        stagger: 0.08,
+        delay: 0.72,
+        clearProps: "opacity,visibility,transform,pointerEvents",
+      });
+    }
+
     function syncBrandWidth() {
       const brand = document.querySelector(".brand-composition");
       const word = document.querySelector(".desktop-brand-word");
@@ -181,6 +216,7 @@
       let hasPlayedIntro = false;
 
       if (!brand || !word) {
+        revealDesktopIcons();
         return;
       }
 
@@ -645,6 +681,7 @@
           gsap.set(subtitle, { autoAlpha: 1, y: 0, filter: "none" });
           gsap.set(blocks, { autoAlpha: 1, scale: 1 });
           drawInkCutouts();
+          revealDesktopIcons();
           return;
         }
 
@@ -660,6 +697,7 @@
             onComplete: () => {
               drawInkCutouts();
               scheduleRandomMerges(true);
+              revealDesktopIcons();
             },
           })
           .to(word, {
