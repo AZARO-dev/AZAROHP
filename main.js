@@ -1000,6 +1000,55 @@
       }
     }
 
+    let lastTouchIcon = null;
+    let lastTouchTime = 0;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+
+    function selectDesktopIcon(icon) {
+      desktopIcons.forEach((item) => item.classList.remove("is-selected"));
+      icon.classList.add("is-selected");
+    }
+
+    function trackIconPointerDown(icon, event) {
+      icon.dataset.pointerStartX = String(event.clientX);
+      icon.dataset.pointerStartY = String(event.clientY);
+    }
+
+    function handleIconTouchOpen(icon, event) {
+      if (event.pointerType !== "touch" && event.pointerType !== "pen") {
+        return;
+      }
+
+      const startX = Number.parseFloat(icon.dataset.pointerStartX || event.clientX);
+      const startY = Number.parseFloat(icon.dataset.pointerStartY || event.clientY);
+      const moveDistance = Math.hypot(event.clientX - startX, event.clientY - startY);
+
+      if (moveDistance > 10) {
+        lastTouchIcon = null;
+        return;
+      }
+
+      const now = window.performance.now();
+      const tapDistance = Math.hypot(event.clientX - lastTouchX, event.clientY - lastTouchY);
+      const isDoubleTap = lastTouchIcon === icon && now - lastTouchTime < 430 && tapDistance < 28;
+
+      selectDesktopIcon(icon);
+
+      if (isDoubleTap) {
+        event.preventDefault();
+        lastTouchIcon = null;
+        lastTouchTime = 0;
+        openDesktopShortcut(icon);
+        return;
+      }
+
+      lastTouchIcon = icon;
+      lastTouchTime = now;
+      lastTouchX = event.clientX;
+      lastTouchY = event.clientY;
+    }
+
     function minimizeWindow(windowEl) {
       if (!windowEl) {
         return;
@@ -1184,10 +1233,11 @@
 
     desktopIcons.forEach((icon) => {
       icon.addEventListener("click", () => {
-        desktopIcons.forEach((item) => item.classList.remove("is-selected"));
-        icon.classList.add("is-selected");
+        selectDesktopIcon(icon);
       });
 
+      icon.addEventListener("pointerdown", (event) => trackIconPointerDown(icon, event));
+      icon.addEventListener("pointerup", (event) => handleIconTouchOpen(icon, event));
       icon.addEventListener("dblclick", () => openDesktopShortcut(icon));
       icon.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {
