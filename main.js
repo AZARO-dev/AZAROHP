@@ -169,6 +169,8 @@
     function syncBrandWidth() {
       const brand = document.querySelector(".brand-composition");
       const word = document.querySelector(".desktop-brand-word");
+      const wordStack = document.querySelector(".brand-word-stack");
+      const subtitle = document.querySelector(".brand-subtitle");
       const panels = Array.from(document.querySelectorAll("[data-brand-grid]"));
       const inkCanvas = document.querySelector("#ink-cutout-canvas");
       const inkContext = inkCanvas ? inkCanvas.getContext("2d") : null;
@@ -309,26 +311,55 @@
           inkContext.stroke();
         });
 
-        const wordStyle = window.getComputedStyle(word);
-        const wordOpacity = Number.parseFloat(wordStyle.opacity) || 0;
+        function drawTextLine(element, alphaOverride = null) {
+          const textStyle = window.getComputedStyle(element);
+          const textOpacity = (alphaOverride === null ? Number.parseFloat(textStyle.opacity) : alphaOverride) || 0;
 
-        if (wordOpacity > 0.001) {
-          const wordRect = word.getBoundingClientRect();
-          const text = word.textContent.trim();
+          if (textOpacity <= 0.001) {
+            return;
+          }
 
-          inkContext.globalAlpha = wordOpacity;
-          inkContext.font = `${wordStyle.fontStyle} ${wordStyle.fontWeight} ${wordStyle.fontSize} ${wordStyle.fontFamily}`;
+          const textRect = element.getBoundingClientRect();
+          const text = element.textContent.trim();
+
+          if (!text || textRect.width <= 0 || textRect.height <= 0) {
+            return;
+          }
+
+          inkContext.globalAlpha = textOpacity;
+          inkContext.font = `${textStyle.fontStyle} ${textStyle.fontWeight} ${textStyle.fontSize} ${textStyle.fontFamily}`;
           inkContext.textAlign = "center";
           inkContext.textBaseline = "alphabetic";
 
           const metrics = inkContext.measureText(text);
-          const ascent = metrics.actualBoundingBoxAscent || wordRect.height * 0.72;
-          const descent = metrics.actualBoundingBoxDescent || wordRect.height * 0.18;
-          const x = wordRect.left - canvasRect.left + wordRect.width / 2;
-          const y = wordRect.top - canvasRect.top + wordRect.height / 2 + (ascent - descent) / 2;
+          const ascent = metrics.actualBoundingBoxAscent || textRect.height * 0.72;
+          const descent = metrics.actualBoundingBoxDescent || textRect.height * 0.18;
+          const x = textRect.left - canvasRect.left + textRect.width / 2;
+          const y = textRect.top - canvasRect.top + textRect.height / 2 + (ascent - descent) / 2;
 
           inkContext.fillText(text, x, y);
         }
+
+        function drawTextCutout(element) {
+          if (!element) {
+            return;
+          }
+
+          const parts = Array.from(element.querySelectorAll("[data-subtitle-part]"));
+
+          if (parts.length) {
+            const elementStyle = window.getComputedStyle(element);
+            const elementOpacity = Number.parseFloat(elementStyle.opacity) || 0;
+
+            parts.forEach((part) => drawTextLine(part, elementOpacity));
+            return;
+          }
+
+          drawTextLine(element);
+        }
+
+        drawTextCutout(word);
+        drawTextCutout(subtitle);
 
         inkContext.globalAlpha = 1;
         inkContext.globalCompositeOperation = "source-over";
@@ -611,12 +642,14 @@
 
         if (prefersReducedMotion) {
           gsap.set(word, { autoAlpha: 1, y: 0, filter: "none" });
+          gsap.set(subtitle, { autoAlpha: 1, y: 0, filter: "none" });
           gsap.set(blocks, { autoAlpha: 1, scale: 1 });
           drawInkCutouts();
           return;
         }
 
         gsap.set(word, { autoAlpha: 0, y: 14, filter: "blur(8px)" });
+        gsap.set(subtitle, { autoAlpha: 0, y: 8, filter: "blur(5px)" });
         gsap.set(blocks, { autoAlpha: 0, scale: 0.2, transformOrigin: "50% 50%" });
         drawInkCutouts();
 
@@ -636,6 +669,17 @@
             duration: 0.82,
             ease: "power2.out",
           })
+          .to(
+            subtitle,
+            {
+              autoAlpha: 1,
+              y: 0,
+              filter: "blur(0px)",
+              duration: 0.46,
+              ease: "power2.out",
+            },
+            "+=0.04",
+          )
           .to(
             blocks,
             {
@@ -658,9 +702,10 @@
         const sideMargin = Number.parseFloat(styles.getPropertyValue("--brand-side-margin")) || 0;
         const desktopRect = desktop.getBoundingClientRect();
         const wordRect = word.getBoundingClientRect();
+        const stackRect = wordStack ? wordStack.getBoundingClientRect() : wordRect;
         const maxWidth = Math.max(220, desktopRect.width - sideMargin);
         const width = Math.min(Math.ceil(wordRect.width), maxWidth);
-        const availablePanelHeight = Math.max(120, (desktopRect.height - 54 - wordRect.height - stackGap * 2) / 2);
+        const availablePanelHeight = Math.max(120, (desktopRect.height - stackRect.height - stackGap * 2) / 2);
         const blockSizeByWidth = (width - gap * (columns - 1)) / columns;
         const blockSizeByHeight = (availablePanelHeight - gap * (rowsPerPanel - 1)) / rowsPerPanel;
         const blockSize = Math.max(8, Math.min(blockSizeByWidth, blockSizeByHeight));

@@ -170,9 +170,17 @@ button {
   will-change: opacity, transform;
 }
 
-.desktop-brand-word {
+.brand-word-stack {
   position: relative;
   z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  max-width: calc(100vw - var(--brand-side-margin));
+}
+
+.desktop-brand-word {
+  position: relative;
   max-width: calc(100vw - var(--brand-side-margin));
   overflow: visible;
   color: transparent;
@@ -189,7 +197,34 @@ button {
   white-space: nowrap;
 }
 
-.brand-composition:not(.is-brand-ready) .desktop-brand-word {
+.brand-subtitle {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.45em;
+  row-gap: 0.12em;
+  max-width: min(var(--brand-word-width), calc(100vw - var(--brand-side-margin)));
+  overflow: visible;
+  color: transparent;
+  font-family: "Soo", serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-align: center;
+  text-shadow: none;
+  -webkit-text-fill-color: transparent;
+  white-space: normal;
+}
+
+.brand-subtitle span {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.brand-composition:not(.is-brand-ready) .desktop-brand-word,
+.brand-composition:not(.is-brand-ready) .brand-subtitle {
   opacity: 0;
   transform: translateY(14px);
 }
@@ -1078,6 +1113,10 @@ body[data-error="gsap"]::before {
     font-size: 7rem;
   }
 
+  .brand-subtitle {
+    font-size: 0.86rem;
+  }
+
   .notes-window,
   .files-window,
   .studio-window,
@@ -1121,6 +1160,11 @@ body[data-error="gsap"]::before {
 
   .desktop-brand-word {
     font-size: 4rem;
+  }
+
+  .brand-subtitle {
+    max-width: min(16rem, calc(100vw - var(--brand-side-margin)));
+    font-size: 0.68rem;
   }
 
   .desktop-icon {
