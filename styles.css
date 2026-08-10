@@ -1168,6 +1168,7 @@ body[data-error="gsap"]::before {
   }
 
   .desktop-icon {
+    left: calc(env(safe-area-inset-left, 0px) + 6px);
     width: 70px;
     font-size: 0.7rem;
   }

@@ -196,7 +196,7 @@
         duration: 0.52,
         ease: "back.out(1.45)",
         stagger: 0.08,
-        delay: 0.72,
+        delay: 3,
         clearProps: "opacity,visibility,transform,pointerEvents",
       });
     }
