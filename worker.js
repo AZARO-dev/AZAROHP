@@ -43,6 +43,9 @@ Grammar:
 - If a sentence uses "dot", do not add "limi", "fhmo", or "eso" in the same sentence.
 - Put adjectives before nouns: "linoa furo" means beautiful flower.
 - Use one adjective when a visible quality is obvious.
+- Add "oa" to a noun to make an adjective meaning "of / belonging to / related to / -like".
+- Noun-derived adjectives with "oa" are allowed and are not invented words.
+- Put noun-derived "oa" adjectives before the noun they describe: "furoa moph" means flower place / place of flowers.
 - Use "viva" to connect visible elements: "furo viva fero" means flower and tree.
 - Use "viva" for a visible with/near relationship: "nya viva furo eso" means person with/near flower.
 - Use "dh" after a place or direction when expressing movement toward it: "nyamoph dh fhmo eso".
@@ -57,6 +60,7 @@ Grammar:
 - "dot" means speak / communicate with.
 - "nopa" is a connective/particle often used in longer statements.
 - "vose" is just a demonstrative meaning this / this one. It is not a required sentence opener.
+- "oa" changes a noun into an adjective meaning "of / -like".
 
 Core vocabulary:
 - vose: this / this one
@@ -85,6 +89,20 @@ Core vocabulary:
 - fumia: short
 - thonoa: bad / unpleasant
 
+Noun-derived adjectives:
+- nyaoa: person's / human / of a person
+- furoa: flower's / floral / of flowers
+- soloa: sun's / sunny / of the sun
+- sonoa: moon's / dark / of the moon
+- spaoa: sky's / spatial / of the sky or space
+- mophoa: place's / local / of a place
+- feroa: tree's / wooden / of trees
+- ruvoa: water's / watery / of water
+- mosoa: death's / dead / of death
+- setaoa: world's / whole-body / of the whole
+- spanyaoa: god's / divine / of a great presence
+- nyamophoa: lower-place / ground-side / of the lower place
+
 Examples:
 - A flower image: linoa furo eso
 - A person image: nya eso
@@ -93,6 +111,10 @@ Examples:
 - A person near a flower: nya viva linoa furo eso
 - A person liking a flower: nya furo limi
 - A peaceful large place: linoa soa moph eso
+- A flower place: furoa moph eso
+- A sunny sky: soloa spa eso
+- A water place: ruvoa moph eso
+- A human body/person-like form: nyaoa seta eso
 - People in a good place: nya viva linoa soa moph eso
 - Two people communicating: nya dot viva nya
 - A person moving toward water: nya ruv dh fhmo
@@ -265,7 +287,7 @@ async function callOpenAI({ env, image }) {
           content: [
             {
               type: "input_text",
-              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. Use limi only when a person is the subject and appears to like something; do not use limi for places, nature, atmosphere, or general beauty. Use only one verb per sentence; do not combine eso, limi, fhmo, or dot in the same sentence. Do not start every sentence with vose; use vose only as this / this one when needed. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
+              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. You may use noun-derived adjectives made by adding oa to nouns, such as furoa, soloa, ruvoa, nyaoa, or feroa. Use limi only when a person is the subject and appears to like something; do not use limi for places, nature, atmosphere, or general beauty. Use only one verb per sentence; do not combine eso, limi, fhmo, or dot in the same sentence. Do not start every sentence with vose; use vose only as this / this one when needed. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
             },
             {
               type: "input_image",
