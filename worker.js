@@ -22,8 +22,8 @@ Style:
 - Mention 2 or 3 visible details when possible: main subject, visible quality, background/place, movement, or nearby element.
 - If a person and an object/place are both visible, describe their relationship when it is visually clear.
 - Prefer a relationship sentence over a simple list when a relationship is visible.
-- Use "limi" when the image shows a pleasant, friendly, beautiful, calm, or positive relation.
-- Prefer including "limi" for warm human scenes, flowers, nature, sunlight, or peaceful places when it fits.
+- Use "limi" only when a person is the subject and appears to like something.
+- Do not use "limi" for places, nature, atmosphere, beauty, or general good feeling.
 - Prefer a slightly detailed description over a minimal label.
 - Use only listed vocabulary. Do not invent words.
 - Do not start every sentence with "vose".
@@ -47,11 +47,12 @@ Grammar:
 - Use "viva" for a visible with/near relationship: "nya viva furo eso" means person with/near flower.
 - Use "dh" after a place or direction when expressing movement toward it: "nyamoph dh fhmo eso".
 - Use "dot viva" when people appear to be communicating: "nya dot viva nya eso".
-- Use "limi" for like, good feeling, pleasant atmosphere, or positive interaction.
+- Use "limi" only for a person liking something.
 - Pattern: "nya furo limi" means person likes / has good feeling toward flower.
-- Pattern: "soa moph limi" means large place has a good / pleasant feeling.
+- The subject of a "limi" sentence must include "nya".
+- For a beautiful or pleasant place, use "linoa ... eso" instead of "limi".
 - "eso" marks "is / is doing / it is".
-- "limi" means like / good feeling / positive feeling.
+- "limi" means a person likes something.
 - "viva" means with / and / together with.
 - "dot" means speak / communicate with.
 - "nopa" is a connective/particle often used in longer statements.
@@ -91,8 +92,8 @@ Examples:
 - A sunny sky image: sol spa eso
 - A person near a flower: nya viva linoa furo eso
 - A person liking a flower: nya furo limi
-- A peaceful large place: soa moph limi
-- People in a good place: nya viva soa moph limi
+- A peaceful large place: linoa soa moph eso
+- People in a good place: nya viva linoa soa moph eso
 - Two people communicating: nya dot viva nya
 - A person moving toward water: nya ruv dh fhmo
 - A person in a large place: nya viva soa moph eso
@@ -132,9 +133,11 @@ function enforceSingleVerbPerLine(value) {
     .split("\n")
     .map((line) => {
       const words = line.split(/\s+/).filter(Boolean);
+      const hasPersonSubject = words.includes("nya");
       let hasVerb = false;
 
       return words
+        .map((word) => (word === "limi" && !hasPersonSubject ? "eso" : word))
         .filter((word) => {
           if (!verbs.has(word)) {
             return true;
@@ -262,7 +265,7 @@ async function callOpenAI({ env, image }) {
           content: [
             {
               type: "input_text",
-              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. Use limi when the scene has a pleasant, friendly, beautiful, calm, or positive relation. Use only one verb per sentence; do not combine eso, limi, fhmo, or dot in the same sentence. Do not start every sentence with vose; use vose only as this / this one when needed. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
+              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. Use limi only when a person is the subject and appears to like something; do not use limi for places, nature, atmosphere, or general beauty. Use only one verb per sentence; do not combine eso, limi, fhmo, or dot in the same sentence. Do not start every sentence with vose; use vose only as this / this one when needed. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
             },
             {
               type: "input_image",
