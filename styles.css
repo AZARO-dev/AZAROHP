@@ -838,8 +838,10 @@ button {
   z-index: 5;
   display: grid;
   width: 258px;
+  min-width: 0;
   gap: 10px;
   padding: 10px;
+  box-sizing: border-box;
   max-height: calc(100% - 150px);
   overflow: hidden auto;
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -914,6 +916,7 @@ button {
   gap: 8px;
   align-items: center;
   justify-content: center;
+  min-width: 0;
 }
 
 .snapper-file-input {
@@ -1049,8 +1052,13 @@ button {
 }
 
 .snapper-uplink-result {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   margin: 0;
   min-height: 40px;
+  max-height: 118px;
   padding: 8px 10px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--radius);
@@ -1059,7 +1067,9 @@ button {
   font-family: "Soo", serif;
   font-size: 1.12rem;
   line-height: 1.2;
+  overflow: hidden auto;
   overflow-wrap: anywhere;
+  word-break: break-word;
   white-space: pre-line;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
@@ -1952,9 +1962,10 @@ body[data-error="gsap"]::before {
 
   .snapper-uplink-result {
     min-height: 34px;
+    max-height: 118px;
     padding: 7px 8px;
-    font-size: 0.88rem;
-    line-height: 1.28;
+    font-size: 0.78rem;
+    line-height: 1.22;
   }
 
   .snapper-dialogue {
