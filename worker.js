@@ -46,6 +46,10 @@ Grammar:
 - Add "oa" to a noun to make an adjective meaning "of / belonging to / related to / -like".
 - Noun-derived adjectives with "oa" are allowed and are not invented words.
 - Put noun-derived "oa" adjectives before the noun they describe: "furoa moph" means flower place / place of flowers.
+- Do not place two nouns directly next to each other.
+- If one noun modifies another noun, turn the first noun into an "oa" adjective: use "ruvoa moph", not "ruv moph".
+- If two nouns are separate visible things, connect them with "viva": use "ruv viva fero", not "ruv fero".
+- If a person subject and an object noun both appear before "limi" or "fhmo", separate them with "nopa": use "nya nopa furo limi".
 - Use "viva" to connect visible elements: "furo viva fero" means flower and tree.
 - Use "viva" for a visible with/near relationship: "nya viva furo eso" means person with/near flower.
 - Use "dh" after a place or direction when expressing movement toward it: "nyamoph dh fhmo eso".
@@ -107,17 +111,18 @@ Examples:
 - A flower image: linoa furo eso
 - A person image: nya eso
 - A tree image: fero eso
-- A sunny sky image: sol spa eso
+- A sunny sky image: soloa spa eso
 - A person near a flower: nya viva linoa furo eso
-- A person liking a flower: nya furo limi
+- A person liking a flower: nya nopa furo limi
 - A peaceful large place: linoa soa moph eso
 - A flower place: furoa moph eso
 - A sunny sky: soloa spa eso
 - A water place: ruvoa moph eso
 - A human body/person-like form: nyaoa seta eso
+- Many trees near water: stua fero viva ruv eso
 - People in a good place: nya viva linoa soa moph eso
 - Two people communicating: nya dot viva nya
-- A person moving toward water: nya ruv dh fhmo
+- A person moving toward water: nya nopa ruv dh fhmo
 - A person in a large place: nya viva soa moph eso
 - A dark water image: koloa ruv eso
 - A large place with sky: soa moph viva spa eso
@@ -150,16 +155,73 @@ function normalizeSoText(value) {
 
 function enforceSingleVerbPerLine(value) {
   const verbs = new Set(["eso", "limi", "fhmo", "dot"]);
+  const personNouns = new Set(["nya", "senya", "sonya"]);
+  const nouns = new Set([
+    "vose",
+    "furo",
+    "nya",
+    "senya",
+    "sonya",
+    "nyamoph",
+    "sol",
+    "son",
+    "spa",
+    "moph",
+    "fero",
+    "ruv",
+    "mos",
+    "spanya",
+    "seta",
+  ]);
+  const nounAdjectives = new Set([
+    "nyaoa",
+    "furoa",
+    "soloa",
+    "sonoa",
+    "spaoa",
+    "mophoa",
+    "feroa",
+    "ruvoa",
+    "mosoa",
+    "setaoa",
+    "spanyaoa",
+    "nyamophoa",
+  ]);
 
   return String(value || "")
     .split("\n")
     .map((line) => {
       const words = line.split(/\s+/).filter(Boolean);
-      const hasPersonSubject = words.includes("nya");
+      const hasPersonSubject = words.some((word) => personNouns.has(word));
       let hasVerb = false;
 
-      return words
+      const sanitizedWords = words
         .map((word) => (word === "limi" && !hasPersonSubject ? "eso" : word))
+        .reduce((result, word, index, mappedWords) => {
+          const previousWord = result[result.length - 1];
+
+          if (nouns.has(previousWord) && nouns.has(word)) {
+            if (previousWord === "nya" && word === "nya") {
+              result.push("viva", word);
+              return result;
+            }
+
+            if (personNouns.has(previousWord) && word !== "nya") {
+              result.push("nopa", word);
+              return result;
+            }
+
+            const derived = `${previousWord}oa`;
+            if (nounAdjectives.has(derived)) {
+              result[result.length - 1] = derived;
+            }
+          }
+
+          result.push(word);
+          return result;
+        }, []);
+
+      return sanitizedWords
         .filter((word) => {
           if (!verbs.has(word)) {
             return true;
@@ -287,7 +349,7 @@ async function callOpenAI({ env, image }) {
           content: [
             {
               type: "input_text",
-              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. You may use noun-derived adjectives made by adding oa to nouns, such as furoa, soloa, ruvoa, nyaoa, or feroa. Use limi only when a person is the subject and appears to like something; do not use limi for places, nature, atmosphere, or general beauty. Use only one verb per sentence; do not combine eso, limi, fhmo, or dot in the same sentence. Do not start every sentence with vose; use vose only as this / this one when needed. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
+              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. You may use noun-derived adjectives made by adding oa to nouns, such as furoa, soloa, ruvoa, nyaoa, or feroa. Do not place two nouns directly next to each other; use an oa adjective for noun modification, viva for separate visible things, or nopa between a person subject and an object noun. Use limi only when a person is the subject and appears to like something; do not use limi for places, nature, atmosphere, or general beauty. Use only one verb per sentence; do not combine eso, limi, fhmo, or dot in the same sentence. Do not start every sentence with vose; use vose only as this / this one when needed. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
             },
             {
               type: "input_image",
