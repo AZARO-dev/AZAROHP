@@ -26,6 +26,9 @@ Style:
 - Prefer including "limi" for warm human scenes, flowers, nature, sunlight, or peaceful places when it fits.
 - Prefer a slightly detailed description over a minimal label.
 - Use only listed vocabulary. Do not invent words.
+- Do not start every sentence with "vose".
+- Use "vose" only when you need to point to a specific "this / this one"; avoid it as an English-style "this is" subject.
+- Use "vose" at most once in a reply unless the image truly needs contrast between this and that.
 - No Japanese, no English explanation.
 - Separate different sentences with a newline.
 - If the image is unclear, describe the most visually obvious object.
@@ -46,9 +49,10 @@ Grammar:
 - "viva" means with / and / together with.
 - "dot" means speak / communicate with.
 - "nopa" is a connective/particle often used in longer statements.
+- "vose" is just a demonstrative meaning this / this one. It is not a required sentence opener.
 
 Core vocabulary:
-- vose: this
+- vose: this / this one
 - furo: flower
 - linoa: beautiful / good
 - nya: person
@@ -75,19 +79,20 @@ Core vocabulary:
 - thonoa: bad / unpleasant
 
 Examples:
-- A flower image: vose linoa furo eso
-- A person image: vose nya eso
-- A tree image: vose fero eso
-- A sunny sky image: vose sol spa eso
-- A person near a flower: vose nya viva linoa furo eso
-- A person liking a flower: vose nya furo limi
-- A peaceful large place: vose soa moph limi
-- People in a good place: vose nya viva soa moph limi
-- Two people communicating: vose nya dot viva nya eso
-- A person moving toward water: vose nya ruv dh fhmo eso
-- A person in a large place: vose nya viva soa moph eso
-- A dark water image: vose koloa ruv eso
-- A large place with sky: vose soa moph viva spa eso
+- A flower image: linoa furo eso
+- A person image: nya eso
+- A tree image: fero eso
+- A sunny sky image: sol spa eso
+- A person near a flower: nya viva linoa furo eso
+- A person liking a flower: nya furo limi
+- A peaceful large place: soa moph limi
+- People in a good place: nya viva soa moph limi
+- Two people communicating: nya dot viva nya eso
+- A person moving toward water: nya ruv dh fhmo eso
+- A person in a large place: nya viva soa moph eso
+- A dark water image: koloa ruv eso
+- A large place with sky: soa moph viva spa eso
+- Use vose only when pointing: vose linoa furo eso
 `.trim();
 
 function jsonResponse(body, init = {}) {
@@ -223,7 +228,7 @@ async function callOpenAI({ env, image }) {
           content: [
             {
               type: "input_text",
-              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. Use limi when the scene has a pleasant, friendly, beautiful, calm, or positive relation. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
+              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. Use limi when the scene has a pleasant, friendly, beautiful, calm, or positive relation. Do not start every sentence with vose; use vose only as this / this one when needed. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
             },
             {
               type: "input_image",
