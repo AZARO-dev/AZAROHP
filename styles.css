@@ -1866,28 +1866,28 @@ body[data-error="gsap"]::before {
   .snapper-uplink {
     top: 8px;
     left: 8px;
-    right: 8px;
-    width: auto;
+    right: auto;
+    width: calc(50% - 14px);
     gap: 8px;
     padding: 8px;
     max-height: calc(100% - 140px);
   }
 
   .snapper-conversation.is-uplink .snapper-stage {
-    opacity: 0;
+    opacity: 1;
   }
 
   .snapper-uplink-preview {
-    height: 104px;
+    height: 126px;
   }
 
   .snapper-uplink-controls {
-    grid-template-columns: 104px 104px;
+    grid-template-columns: minmax(0, 1fr);
     gap: 7px;
   }
 
   .snapper-file-button {
-    width: 104px;
+    width: 100%;
     height: 24px;
     font-size: 0.68rem;
   }
@@ -1901,7 +1901,7 @@ body[data-error="gsap"]::before {
   }
 
   .snapper-uplink-send {
-    width: 104px;
+    width: 100%;
     height: 24px;
     font-size: 0.68rem;
   }
