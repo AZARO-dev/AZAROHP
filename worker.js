@@ -7,8 +7,8 @@ const corsHeaders = {
 const maxImageBytes = 8 * 1024 * 1024;
 
 const soLanguageGuide = `
-You are translating an image description into Soo, a constructed alien language.
-Return a short sentence in Soo romanization only.
+You are translating a detailed image description into Soo, a constructed alien language.
+Return one or two short Soo sentences in romanization only.
 
 Important normalization:
 - Read every "u'" as "h".
@@ -17,12 +17,19 @@ Important normalization:
 
 Style:
 - Use simple words from the database when possible.
-- Prefer one short sentence.
+- Describe the photo as specifically as the vocabulary allows.
+- Mention 2 or 3 visible details when possible: main subject, visible quality, background/place, movement, or nearby element.
+- Prefer a slightly detailed description over a minimal label.
+- Use only listed vocabulary. Do not invent words.
 - No Japanese, no English explanation.
 - If the image is unclear, describe the most visually obvious object.
 
 Grammar:
 - SOV word order.
+- Put adjectives before nouns: "linoa furo" means beautiful flower.
+- Use one adjective when a visible quality is obvious.
+- Use "viva" to connect visible elements: "furo viva fero" means flower and tree.
+- Use "dh" after a place or direction when expressing movement toward it: "nyamoph dh fhmo eso".
 - "eso" marks "is / is doing / it is".
 - "limi" means like / good feeling / positive feeling.
 - "viva" means with / and / together with.
@@ -34,6 +41,7 @@ Core vocabulary:
 - furo: flower
 - linoa: beautiful / good
 - nya: person
+- soa: big / great
 - senya: I / me
 - sonya: you
 - nyamoph: lower place / below / ground-side
@@ -49,12 +57,20 @@ Core vocabulary:
 - spanya: god / great presence
 - moa: small / weak
 - seta: world / body / whole
+- stua: many
+- koloa: dark
+- ruvspoa: long
+- fumia: short
+- thonoa: bad / unpleasant
 
 Examples:
 - A flower image: vose linoa furo eso
 - A person image: vose nya eso
 - A tree image: vose fero eso
 - A sunny sky image: vose sol spa eso
+- A person near a flower: vose nya viva linoa furo eso
+- A dark water image: vose koloa ruv eso
+- A large place with sky: vose soa moph viva spa eso
 `.trim();
 
 function jsonResponse(body, init = {}) {
@@ -187,7 +203,7 @@ async function callOpenAI({ env, image }) {
           content: [
             {
               type: "input_text",
-              text: "Describe this image in one short Soo sentence. Return only the Soo romanized sentence, no JSON and no explanation.",
+              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, or nearby elements. Return only Soo romanization, no JSON and no explanation.",
             },
             {
               type: "input_image",
