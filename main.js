@@ -1594,6 +1594,10 @@
       return String(value || "")
         .replace(/[’]/g, "'")
         .replace(/u'/g, "h")
+        .split(/\r?\n+/)
+        .map((line) => line.replace(/[ \t]+/g, " ").trim())
+        .filter(Boolean)
+        .join("\n")
         .trim();
     }
 

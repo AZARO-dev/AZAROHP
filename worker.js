@@ -9,6 +9,7 @@ const maxImageBytes = 8 * 1024 * 1024;
 const soLanguageGuide = `
 You are translating a detailed image description into Soo, a constructed alien language.
 Return one or two short Soo sentences in romanization only.
+If you return two sentences, put each sentence on its own line.
 
 Important normalization:
 - Read every "u'" as "h".
@@ -22,6 +23,7 @@ Style:
 - Prefer a slightly detailed description over a minimal label.
 - Use only listed vocabulary. Do not invent words.
 - No Japanese, no English explanation.
+- Separate different sentences with a newline.
 - If the image is unclear, describe the most visually obvious object.
 
 Grammar:
@@ -90,7 +92,10 @@ function normalizeSoText(value) {
     .replace(/[\u2018\u2019]/g, "'")
     .replace(/u'/gi, "h")
     .replace(/[^a-zA-Z'\s.?!-]/g, " ")
-    .replace(/\s+/g, " ")
+    .split(/\r?\n+/)
+    .map((line) => line.replace(/[ \t]+/g, " ").trim())
+    .filter(Boolean)
+    .join("\n")
     .trim();
 }
 
@@ -203,7 +208,7 @@ async function callOpenAI({ env, image }) {
           content: [
             {
               type: "input_text",
-              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, or nearby elements. Return only Soo romanization, no JSON and no explanation.",
+              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, or nearby elements. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
             },
             {
               type: "input_image",
