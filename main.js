@@ -1690,6 +1690,7 @@
     function showSnapperUplink() {
       const conversation = document.querySelector(".snapper-conversation");
       const uplink = document.querySelector("#snapper-uplink");
+      const skipButton = document.querySelector("#snapper-skip-button");
 
       if (!conversation || !uplink) {
         return;
@@ -1697,6 +1698,9 @@
 
       snapperUplinkVisible = true;
       uplink.hidden = false;
+      if (skipButton) {
+        skipButton.hidden = true;
+      }
       conversation.classList.add("is-uplink");
       updateSnapperScene({});
       setSnapperCompletionGlyph(false);
@@ -1708,6 +1712,41 @@
           { autoAlpha: 1, y: 0, scale: 1, duration: 0.36, ease: "back.out(1.7)", overwrite: true },
         );
       }
+    }
+
+    function skipSnapperIntro() {
+      const character = document.querySelector("#snapper-character");
+      const dialogue = document.querySelector("#snapper-dialogue-text") || document.querySelector("#snapper-dialogue");
+      const skipButton = document.querySelector("#snapper-skip-button");
+      const finalIndex = snapperDialogueScript.length - 1;
+      const finalEntry = snapperDialogueScript[finalIndex];
+
+      snapperDialogueIndex = finalIndex;
+      snapperSampleSent = true;
+
+      if (snapperTextTween) {
+        snapperTextTween.kill();
+        snapperTextTween = null;
+      }
+
+      if (snapperCompletionTween) {
+        snapperCompletionTween.kill();
+        snapperCompletionTween = null;
+      }
+
+      if (character && finalEntry) {
+        character.src = finalEntry.src;
+      }
+
+      if (dialogue && finalEntry) {
+        dialogue.textContent = finalEntry.text;
+      }
+
+      if (skipButton) {
+        skipButton.hidden = true;
+      }
+
+      setSnapperCompletionGlyph(true);
     }
 
     function clearSnapperUplinkResult() {
@@ -1810,12 +1849,16 @@
     function renderSnapperDialogue(index, options = {}) {
       const character = document.querySelector("#snapper-character");
       const dialogue = document.querySelector("#snapper-dialogue-text") || document.querySelector("#snapper-dialogue");
+      const skipButton = document.querySelector("#snapper-skip-button");
 
       if (!character || !dialogue || !snapperDialogueScript.length) {
         return;
       }
 
       snapperDialogueIndex = Math.max(0, Math.min(index, snapperDialogueScript.length - 1));
+      if (skipButton) {
+        skipButton.hidden = snapperDialogueIndex >= snapperDialogueScript.length - 1 || snapperUplinkVisible;
+      }
       const entry = snapperDialogueScript[snapperDialogueIndex];
       const text = entry.text;
       const chars = Array.from(text);
@@ -1894,12 +1937,20 @@
     function initSnapperDialogue() {
       const conversation = document.querySelector(".snapper-conversation");
       const sendButton = document.querySelector("#snapper-send-button");
+      const skipButton = document.querySelector("#snapper-skip-button");
 
       if (!conversation || !sendButton) {
         return;
       }
 
       initSnapperUploader();
+
+      if (skipButton) {
+        skipButton.addEventListener("click", (event) => {
+          event.stopPropagation();
+          skipSnapperIntro();
+        });
+      }
 
       conversation.addEventListener("click", () => advanceSnapperDialogue(1));
       conversation.addEventListener("keydown", (event) => {

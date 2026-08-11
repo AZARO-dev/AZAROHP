@@ -660,6 +660,38 @@ button {
   cursor: pointer;
 }
 
+.snapper-skip-button {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  height: 20px;
+  padding: 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.72);
+  font-family: "Madoufmg", "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 0.58rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.snapper-skip-button:hover,
+.snapper-skip-button:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.38);
+  outline-offset: 2px;
+  color: #ffffff;
+}
+
+.snapper-skip-button[hidden] {
+  display: none;
+}
+
 .snapper-scene-visual {
   position: absolute;
   top: 18px;
@@ -1782,6 +1814,15 @@ body[data-error="gsap"]::before {
     left: 10px;
     min-height: 112px;
     padding: 10px;
+  }
+
+  .snapper-skip-button {
+    top: 7px;
+    right: 8px;
+    min-width: 40px;
+    height: 19px;
+    padding: 0 7px;
+    font-size: 0.54rem;
   }
 
   .snapper-scene-visual {
