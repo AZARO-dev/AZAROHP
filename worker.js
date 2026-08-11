@@ -90,16 +90,60 @@ function arrayBufferToBase64(buffer) {
   return btoa(binary);
 }
 
+function collectTextValues(value, texts = []) {
+  if (!value) {
+    return texts;
+  }
+
+  if (typeof value === "string") {
+    return texts;
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      collectTextValues(item, texts);
+    }
+
+    return texts;
+  }
+
+  if (typeof value !== "object") {
+    return texts;
+  }
+
+  for (const [key, child] of Object.entries(value)) {
+    if ((key === "text" || key === "output_text") && typeof child === "string") {
+      texts.push(child);
+      continue;
+    }
+
+    collectTextValues(child, texts);
+  }
+
+  return texts;
+}
+
 function extractOutputText(payload) {
   if (typeof payload?.output_text === "string") {
     return payload.output_text;
   }
 
-  const firstText = payload?.output
-    ?.flatMap((item) => item.content || [])
-    ?.find((content) => typeof content.text === "string");
+  const outputTexts = collectTextValues(payload?.output);
 
-  return firstText?.text || "";
+  return outputTexts.join("\n").trim();
+}
+
+function extractSooReply(rawText) {
+  if (!rawText) {
+    return "";
+  }
+
+  try {
+    const parsed = JSON.parse(rawText);
+    return parsed.so || parsed.reply || parsed.message || rawText;
+  } catch {
+    return rawText;
+  }
 }
 
 async function callOpenAI({ env, image }) {
@@ -115,6 +159,14 @@ async function callOpenAI({ env, image }) {
   const mimeType = image.type || "image/png";
   const imageUrl = `data:${mimeType};base64,${arrayBufferToBase64(buffer)}`;
   const model = env.OPENAI_MODEL || "gpt-5.6-luna";
+  const startedAt = Date.now();
+
+  console.log({
+    event: "snapper_openai_start",
+    imageBytes: buffer.byteLength,
+    imageType: mimeType,
+    model,
+  });
 
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
@@ -124,6 +176,7 @@ async function callOpenAI({ env, image }) {
     },
     body: JSON.stringify({
       model,
+      reasoning: { effort: "low" },
       input: [
         {
           role: "developer",
@@ -134,7 +187,7 @@ async function callOpenAI({ env, image }) {
           content: [
             {
               type: "input_text",
-              text: "Describe this image in one short Soo sentence. Return JSON only: {\"so\":\"...\"}",
+              text: "Describe this image in one short Soo sentence. Return only the Soo romanized sentence, no JSON and no explanation.",
             },
             {
               type: "input_image",
@@ -144,13 +197,23 @@ async function callOpenAI({ env, image }) {
           ],
         },
       ],
-      max_output_tokens: 80,
+      max_output_tokens: 300,
       store: false,
     }),
   });
 
   const payload = await response.json().catch(() => ({}));
   const requestId = response.headers.get("x-request-id") || "";
+
+  console.log({
+    event: "snapper_openai_end",
+    status: response.status,
+    requestId,
+    durationMs: Date.now() - startedAt,
+    outputStatus: payload?.status || "",
+    incompleteReason: payload?.incomplete_details?.reason || "",
+    outputItems: Array.isArray(payload?.output) ? payload.output.length : 0,
+  });
 
   if (!response.ok) {
     return jsonResponse(
@@ -164,23 +227,25 @@ async function callOpenAI({ env, image }) {
   }
 
   const rawText = extractOutputText(payload);
-  let so = rawText;
-
-  try {
-    const parsed = JSON.parse(rawText);
-    so = parsed.so || parsed.reply || rawText;
-  } catch {
-    so = rawText;
-  }
-
+  const so = extractSooReply(rawText);
   const normalized = normalizeSoText(so);
 
   if (!normalized) {
+    console.error({
+      event: "snapper_empty_reply",
+      requestId,
+      outputStatus: payload?.status || "",
+      incompleteReason: payload?.incomplete_details?.reason || "",
+      rawTextLength: rawText.length,
+    });
+
     return jsonResponse(
       {
         error: "EMPTY_SOO_REPLY",
         message: "OpenAI response did not include a usable Soo reply.",
         requestId,
+        outputStatus: payload?.status || "",
+        incompleteReason: payload?.incomplete_details?.reason || "",
       },
       { status: 502 },
     );
@@ -223,6 +288,14 @@ export default {
 
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
+    }
+
+    if (url.pathname === "/api/health") {
+      return jsonResponse({
+        ok: true,
+        hasOpenAIKey: Boolean(env.OPENAI_API_KEY),
+        model: env.OPENAI_MODEL || "gpt-5.6-luna",
+      });
     }
 
     if (url.pathname === "/api/describe") {
