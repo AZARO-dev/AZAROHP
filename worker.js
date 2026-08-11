@@ -22,6 +22,8 @@ Style:
 - Mention 2 or 3 visible details when possible: main subject, visible quality, background/place, movement, or nearby element.
 - If a person and an object/place are both visible, describe their relationship when it is visually clear.
 - Prefer a relationship sentence over a simple list when a relationship is visible.
+- Use "limi" when the image shows a pleasant, friendly, beautiful, calm, or positive relation.
+- Prefer including "limi" for warm human scenes, flowers, nature, sunlight, or peaceful places when it fits.
 - Prefer a slightly detailed description over a minimal label.
 - Use only listed vocabulary. Do not invent words.
 - No Japanese, no English explanation.
@@ -36,7 +38,9 @@ Grammar:
 - Use "viva" for a visible with/near relationship: "nya viva furo eso" means person with/near flower.
 - Use "dh" after a place or direction when expressing movement toward it: "nyamoph dh fhmo eso".
 - Use "dot viva" when people appear to be communicating: "nya dot viva nya eso".
-- Use "limi" only when a person clearly seems to like or positively interact with something.
+- Use "limi" for like, good feeling, pleasant atmosphere, or positive interaction.
+- Pattern: "nya furo limi" means person likes / has good feeling toward flower.
+- Pattern: "soa moph limi" means large place has a good / pleasant feeling.
 - "eso" marks "is / is doing / it is".
 - "limi" means like / good feeling / positive feeling.
 - "viva" means with / and / together with.
@@ -76,6 +80,9 @@ Examples:
 - A tree image: vose fero eso
 - A sunny sky image: vose sol spa eso
 - A person near a flower: vose nya viva linoa furo eso
+- A person liking a flower: vose nya furo limi
+- A peaceful large place: vose soa moph limi
+- People in a good place: vose nya viva soa moph limi
 - Two people communicating: vose nya dot viva nya eso
 - A person moving toward water: vose nya ruv dh fhmo eso
 - A person in a large place: vose nya viva soa moph eso
@@ -216,7 +223,7 @@ async function callOpenAI({ env, image }) {
           content: [
             {
               type: "input_text",
-              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
+              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. Use limi when the scene has a pleasant, friendly, beautiful, calm, or positive relation. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
             },
             {
               type: "input_image",
