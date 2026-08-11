@@ -1,4 +1,5 @@
 .git
+.wrangler
 .gitignore
 .dev.vars
 .dev.vars.*
