@@ -1609,6 +1609,14 @@
       return "vose linoa furo eso";
     }
 
+    function getSnapperApiErrorMessage(payload, status) {
+      if (payload && typeof payload === "object") {
+        return payload.message || payload.error || `API request failed (${status})`;
+      }
+
+      return `API request failed (${status})`;
+    }
+
     function wait(ms) {
       return new Promise((resolve) => window.setTimeout(resolve, ms));
     }
@@ -1627,17 +1635,23 @@
             body: formData,
           });
 
+          const payload = await response.json().catch(() => ({}));
+
           if (response.ok) {
-            const payload = await response.json();
             const reply = getSnapperReplyFromPayload(payload);
 
             if (reply) {
               await minimumLoadingTime;
               return reply;
             }
+
+            throw new Error("API response did not include a Soo reply.");
           }
-        } catch {
-          // The Worker API is optional for now; the UI keeps working with a local reply.
+
+          throw new Error(getSnapperApiErrorMessage(payload, response.status));
+        } catch (error) {
+          await minimumLoadingTime;
+          throw error;
         }
       }
 
@@ -1749,7 +1763,14 @@
       setSnapperUplinkLoading(true);
       speakSnapperAside(pickSnapperSendAside());
 
-      const reply = await requestSnapperDescription(snapperSelectedImageFile);
+      let reply = "";
+
+      try {
+        reply = await requestSnapperDescription(snapperSelectedImageFile);
+      } catch (error) {
+        console.warn("Snapper API request failed:", error);
+        reply = "通信が失敗したわ。SecretとWorker Logsを確認してみて";
+      }
 
       setSnapperUplinkLoading(false);
       result.textContent = reply;

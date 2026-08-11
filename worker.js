@@ -150,12 +150,14 @@ async function callOpenAI({ env, image }) {
   });
 
   const payload = await response.json().catch(() => ({}));
+  const requestId = response.headers.get("x-request-id") || "";
 
   if (!response.ok) {
     return jsonResponse(
       {
         error: "OPENAI_REQUEST_FAILED",
         message: payload?.error?.message || "OpenAI API request failed.",
+        requestId,
       },
       { status: response.status },
     );
@@ -171,9 +173,20 @@ async function callOpenAI({ env, image }) {
     so = rawText;
   }
 
-  const normalized = normalizeSoText(so) || "vose linoa furo eso";
+  const normalized = normalizeSoText(so);
 
-  return jsonResponse({ so: normalized });
+  if (!normalized) {
+    return jsonResponse(
+      {
+        error: "EMPTY_SOO_REPLY",
+        message: "OpenAI response did not include a usable Soo reply.",
+        requestId,
+      },
+      { status: 502 },
+    );
+  }
+
+  return jsonResponse({ so: normalized, requestId });
 }
 
 async function handleDescribe(request, env) {
