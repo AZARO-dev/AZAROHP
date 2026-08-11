@@ -35,6 +35,12 @@ Style:
 
 Grammar:
 - SOV word order.
+- Use only one verb per sentence.
+- Do not combine verbs in one sentence.
+- "eso", "limi", "fhmo", and "dot" are verbs. Choose only one of them for each sentence.
+- If a sentence uses "limi", do not add "eso".
+- If a sentence uses "fhmo", do not add "limi" or "eso" in the same sentence.
+- If a sentence uses "dot", do not add "limi", "fhmo", or "eso" in the same sentence.
 - Put adjectives before nouns: "linoa furo" means beautiful flower.
 - Use one adjective when a visible quality is obvious.
 - Use "viva" to connect visible elements: "furo viva fero" means flower and tree.
@@ -87,8 +93,8 @@ Examples:
 - A person liking a flower: nya furo limi
 - A peaceful large place: soa moph limi
 - People in a good place: nya viva soa moph limi
-- Two people communicating: nya dot viva nya eso
-- A person moving toward water: nya ruv dh fhmo eso
+- Two people communicating: nya dot viva nya
+- A person moving toward water: nya ruv dh fhmo
 - A person in a large place: nya viva soa moph eso
 - A dark water image: koloa ruv eso
 - A large place with sky: soa moph viva spa eso
@@ -117,6 +123,34 @@ function normalizeSoText(value) {
     .filter(Boolean)
     .join("\n")
     .trim();
+}
+
+function enforceSingleVerbPerLine(value) {
+  const verbs = new Set(["eso", "limi", "fhmo", "dot"]);
+
+  return String(value || "")
+    .split("\n")
+    .map((line) => {
+      const words = line.split(/\s+/).filter(Boolean);
+      let hasVerb = false;
+
+      return words
+        .filter((word) => {
+          if (!verbs.has(word)) {
+            return true;
+          }
+
+          if (hasVerb) {
+            return false;
+          }
+
+          hasVerb = true;
+          return true;
+        })
+        .join(" ");
+    })
+    .filter(Boolean)
+    .join("\n");
 }
 
 function arrayBufferToBase64(buffer) {
@@ -228,7 +262,7 @@ async function callOpenAI({ env, image }) {
           content: [
             {
               type: "input_text",
-              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. Use limi when the scene has a pleasant, friendly, beautiful, calm, or positive relation. Do not start every sentence with vose; use vose only as this / this one when needed. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
+              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. Use limi when the scene has a pleasant, friendly, beautiful, calm, or positive relation. Use only one verb per sentence; do not combine eso, limi, fhmo, or dot in the same sentence. Do not start every sentence with vose; use vose only as this / this one when needed. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
             },
             {
               type: "input_image",
@@ -269,7 +303,7 @@ async function callOpenAI({ env, image }) {
 
   const rawText = extractOutputText(payload);
   const so = extractSooReply(rawText);
-  const normalized = normalizeSoText(so);
+  const normalized = enforceSingleVerbPerLine(normalizeSoText(so));
 
   if (!normalized) {
     console.error({
