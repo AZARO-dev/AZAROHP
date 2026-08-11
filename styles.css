@@ -931,9 +931,9 @@ button {
   display: grid;
   place-items: center;
   width: 112px;
-  height: 29px;
+  min-height: 29px;
   overflow: hidden;
-  padding: 0;
+  padding: 6px 8px;
   border: 0;
   border-radius: 0;
   background: url("snapper-send.png") center / 100% 100% no-repeat;
@@ -942,6 +942,7 @@ button {
   font-size: 0.76rem;
   line-height: 1;
   text-align: center;
+  overflow-wrap: anywhere;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
   user-select: none;
   cursor: pointer;
@@ -965,15 +966,17 @@ button {
   display: grid;
   place-items: center;
   width: 112px;
-  height: 29px;
+  min-height: 29px;
   overflow: hidden;
-  padding: 0;
+  padding: 6px 8px;
   border: 0;
   background: transparent;
   color: #ffffff;
   font-family: "Madoufmg", "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif;
   font-size: 0.76rem;
   line-height: 1;
+  text-align: center;
+  overflow-wrap: anywhere;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
   cursor: pointer;
 }
@@ -1867,7 +1870,7 @@ body[data-error="gsap"]::before {
     top: 8px;
     left: 8px;
     right: auto;
-    width: calc(50% - 14px);
+    width: calc(66.666% - 14px);
     gap: 8px;
     padding: 8px;
     max-height: calc(100% - 140px);
@@ -1875,6 +1878,14 @@ body[data-error="gsap"]::before {
 
   .snapper-conversation.is-uplink .snapper-stage {
     opacity: 1;
+  }
+
+  .snapper-conversation.is-uplink .snapper-character {
+    position: absolute;
+    top: -38px;
+    right: -6px;
+    max-width: none;
+    margin: 0;
   }
 
   .snapper-uplink-preview {
@@ -1888,8 +1899,10 @@ body[data-error="gsap"]::before {
 
   .snapper-file-button {
     width: 100%;
-    height: 24px;
-    font-size: 0.68rem;
+    min-height: 31px;
+    padding: 7px 6px;
+    font-size: 0.62rem;
+    line-height: 1.15;
   }
 
   .snapper-file-button-desktop {
@@ -1902,8 +1915,10 @@ body[data-error="gsap"]::before {
 
   .snapper-uplink-send {
     width: 100%;
-    height: 24px;
-    font-size: 0.68rem;
+    min-height: 31px;
+    padding: 7px 6px;
+    font-size: 0.62rem;
+    line-height: 1.15;
   }
 
   .snapper-loading {
@@ -1938,7 +1953,8 @@ body[data-error="gsap"]::before {
   .snapper-uplink-result {
     min-height: 34px;
     padding: 7px 8px;
-    font-size: 0.98rem;
+    font-size: 0.88rem;
+    line-height: 1.28;
   }
 
   .snapper-dialogue {
