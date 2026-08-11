@@ -61,11 +61,15 @@
           <span class="icon-glyph terminal-glyph" aria-hidden="true"></span>
           <span>Terminal</span>
         </button>
-        <button class="desktop-icon" type="button" data-url="https://graphophony.pages.dev/" style="--icon-x: 22px; --icon-y: 230px;" aria-label="Open Graph">
+        <button class="desktop-icon" type="button" data-window-target="snapper" style="--icon-x: 22px; --icon-y: 230px;" aria-label="Open CONTACT">
+          <span class="icon-glyph snapper-glyph" aria-hidden="true">g</span>
+          <span>CONTACT</span>
+        </button>
+        <button class="desktop-icon" type="button" data-url="https://graphophony.pages.dev/" style="--icon-x: 22px; --icon-y: 334px;" aria-label="Open Graph">
           <span class="icon-glyph url-glyph" aria-hidden="true">r</span>
           <span>Graph</span>
         </button>
-        <button class="desktop-icon" type="button" data-url="https://manusorganum.pages.dev/" style="--icon-x: 22px; --icon-y: 334px;" aria-label="Open Manus Organum">
+        <button class="desktop-icon" type="button" data-url="https://manusorganum.pages.dev/" style="--icon-x: 22px; --icon-y: 438px;" aria-label="Open Manus Organum">
           <span class="icon-glyph url-glyph" aria-hidden="true">m</span>
           <span>Manus Organum</span>
         </button>
@@ -87,6 +91,82 @@
           <label for="readme-text">README.md</label>
           <textarea id="readme-text" spellcheck="false">あげまきあざろのホームページ。
 作成したものをならべます。</textarea>
+        </div>
+      </section>
+
+      <section class="os-window snapper-window" data-window="snapper" aria-label="CONTACT window">
+        <header class="window-titlebar">
+          <div class="window-title">
+            <span class="title-icon snapper-glyph" aria-hidden="true">g</span>
+            <strong>CONTACT</strong>
+          </div>
+          <div class="window-controls" aria-label="Window controls">
+            <button type="button" data-os-action="minimize" aria-label="最小化">_</button>
+            <button type="button" data-os-action="maximize" aria-label="最大化">□</button>
+            <button type="button" data-os-action="close" aria-label="閉じる">×</button>
+          </div>
+        </header>
+        <div class="window-body snapper-body">
+          <div class="snapper-conversation" tabindex="0" aria-label="Mizuki dialogue screen">
+            <div class="snapper-stage" aria-hidden="true">
+              <img
+                class="snapper-character"
+                id="snapper-character"
+                src="snapper-normal.png"
+                alt=""
+              >
+            </div>
+            <div class="snapper-scene-visual" id="snapper-scene-visual" hidden>
+              <img
+                class="snapper-device"
+                id="snapper-device"
+                src="snapper-computer.png"
+                alt="星間通信装置"
+              >
+              <img
+                class="snapper-box"
+                id="snapper-box"
+                src="snapper-box.png"
+                alt="パスワードの掛かったデータの箱"
+                hidden
+              >
+              <div class="snapper-sample-card" id="snapper-sample-card" hidden>
+                <img src="snapper-flower.png" alt="送信用の花の画像">
+              </div>
+              <button class="snapper-send-button" type="button" id="snapper-send-button" hidden>
+                <img src="snapper-send.png" alt="">
+                <span>[送信]</span>
+              </button>
+              <p class="snapper-alien-reply" id="snapper-alien-reply" hidden>vose linoa furo eso</p>
+            </div>
+            <div class="snapper-uplink" id="snapper-uplink" hidden aria-label="星間通信">
+              <div class="snapper-uplink-preview" id="snapper-uplink-preview">
+                <img class="snapper-uplink-image" id="snapper-uplink-image" alt="送信する画像" hidden>
+                <span class="snapper-uplink-placeholder" id="snapper-uplink-placeholder" aria-hidden="true">a</span>
+              </div>
+              <div class="snapper-uplink-controls">
+                <input class="snapper-file-input" id="snapper-image-input" type="file" accept="image/*">
+                <label class="snapper-file-button" for="snapper-image-input">
+                  <span class="snapper-file-button-desktop">ファイル選択</span>
+                  <span class="snapper-file-button-mobile">画像を追加</span>
+                </label>
+                <button class="snapper-uplink-send" type="button" id="snapper-uplink-send" disabled>
+                  <img src="snapper-send.png" alt="">
+                  <span>[送信]</span>
+                </button>
+              </div>
+              <div class="snapper-loading" id="snapper-loading" hidden aria-label="通信中">
+                <span class="snapper-loading-logo" aria-hidden="true">a</span>
+              </div>
+              <p class="snapper-uplink-result" id="snapper-uplink-result" hidden aria-live="polite"></p>
+            </div>
+            <div class="snapper-dialogue-panel" aria-live="polite">
+              <p class="snapper-speaker">ミヅキ</p>
+              <p class="snapper-dialogue" id="snapper-dialogue">
+                <span id="snapper-dialogue-text">はじめまして、私は異星言語学者のミヅキです</span><span class="snapper-completion-glyph" id="snapper-completion-glyph" hidden aria-hidden="true">g</span>
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -161,11 +241,11 @@
         </header>
         <div class="window-body terminal-body">
           <pre id="terminal-log">terminal ready
-try: open readme, focus terminal, pulse</pre>
+try: open readme, open contact, focus terminal, pulse</pre>
           <form id="terminal-form">
             <label class="sr-only" for="terminal-input">Command</label>
             <span>&gt;</span>
-            <input id="terminal-input" autocomplete="off" placeholder="pulse / open readme / focus terminal">
+            <input id="terminal-input" autocomplete="off" placeholder="pulse / open contact / focus terminal">
           </form>
         </div>
       </section>

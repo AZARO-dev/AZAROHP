@@ -978,6 +978,10 @@
       } else {
         gsap.set(windowEl, { autoAlpha: 1, scale: 1 });
       }
+
+      if (name === "snapper" && !wasOpen) {
+        playSnapperDialogue();
+      }
     }
 
     function openDesktopShortcut(icon) {
@@ -1206,6 +1210,694 @@
         { scale: 0.985 },
         { scale: 1, duration: 0.24, ease: "back.out(2.2)" },
       );
+    }
+
+    let snapperTextTween = null;
+    let snapperCompletionTween = null;
+    let snapperDialogueIndex = 0;
+    let snapperSampleSent = false;
+    let snapperUplinkVisible = false;
+    let snapperUplinkBusy = false;
+    let snapperSelectedImageFile = null;
+    let snapperSelectedImageUrl = "";
+    let snapperLastAsideIndex = -1;
+
+    const snapperDialogueScript = [
+      {
+        src: "snapper-smile.png",
+        text: "はじめまして、私は異星言語学者のミヅキです",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "会えて嬉しいわ",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "このサイトを開いたとき、初めて見た記号の羅列が書いてあったでしょう",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "あれはつい最近異星から送られてきたメッセージなの",
+      },
+      {
+        src: "snapper-normal.png",
+        scene: "box",
+        text: "そしてこのパスワードの掛かったデータも一緒に送られてきたの、私たちは箱って呼んでるわ",
+      },
+      {
+        src: "snapper-sad.png",
+        text: "ボイジャーのおかげかしらね。しかし、解読に難航していて、、",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "是非あなたにも協力していただきたいわ",
+      },
+      {
+        src: "snapper-normal.png",
+        scene: "device",
+        text: "私が研究して作成した星間通信装置！これを使って異星と交信が可能になるわ",
+      },
+      {
+        src: "snapper-normal.png",
+        scene: "device",
+        text: "なんだか画像を送ると異星の方がどんな画像か説明してくれるみたい",
+      },
+      {
+        src: "snapper-smile.png",
+        scene: "sample",
+        requiresSend: true,
+        text: "試しにこの画像を送ってほしいわ",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "異星と交信できたわね！",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "あなたが撮った好きな画像を送ってどんな画像か説明してもらいましょう",
+      },
+      {
+        src: "snapper-angry.png",
+        text: "目標はこの鍵のかかったデータを開けることよ。文章が説明できるくらい単語や文法を集めましょう",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "あと、注意事項なのだけど異星と交信するのだからあまりプライベートな写真を送信するのはNGよ",
+      },
+      {
+        src: "snapper-sad.png",
+        text: "研究データとして一生残るかも、、",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "あなたの良識に任せるわ",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "これからよろしくね",
+      },
+    ];
+
+    const snapperSendAsides = [
+      {
+        src: "snapper-normal.png",
+        text: "実は私、コーヒーより白湯の方が好きなの。研究室が冷えすぎるから",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "この装置、名前を付けようとしたんだけど、候補が全部ダサくて保留中よ",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "異星言語学者って言うと大げさだけど、普段は記号とにらめっこしてるだけなの",
+      },
+      {
+        src: "snapper-sad.png",
+        text: "解読中に寝落ちして、朝起きたらノートに意味不明な線が増えていたことがあるわ",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "初めて異星から返事が来た日は、嬉しくて研究室の電気を消し忘れたの",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "私は静かな場所が好き。機械音と紙をめくる音くらいがちょうどいいわ",
+      },
+      {
+        src: "snapper-angry.png",
+        text: "同僚はこの箱を文鎮にしようとしたのよ。もちろん全力で止めたわ",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "未知の単語を見つけた瞬間って、鍵穴にぴったり合う音が聞こえる気がするの",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "実家にはこの研究のこと、まだ半分くらいしか説明していないわ",
+      },
+      {
+        src: "snapper-sad.png",
+        text: "締め切り前の私はあまり見せられないわね。髪も資料も大変なことになるから",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "あなたが送る画像、少し楽しみにしてるの。研究者として、もちろん研究者としてよ",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "この文字、眺めているとたまに音楽みたいに見えるの。不思議でしょう",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "子どもの頃は古いラジオを分解するのが好きだったわ。元に戻せたことは少ないけど",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "チョコチップクッキーが好きなの。研究室に置くと、一枚だけのつもりがいつの間にかなくなっているわ",
+      },
+      {
+        src: "snapper-sad.png",
+        text: "学生の頃、発表前日に資料を全部作り直したことがあるわ。あれはもう二度と嫌ね",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "朝より夜の方が頭が澄むの。え、生活習慣には気を付けないといけない？",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "古い地図を見るのが好きよ。知らない場所なのに、誰かの記憶みたいで",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "文字を書く時は左上をきっちり揃えたいの。そこが乱れると一日気になるわ",
+      },
+      {
+        src: "snapper-angry.png",
+        text: "昔、暗号遊びで友人を三日ほど困らせたことがあるわ。少しだけ反省しているの",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "好きな色は白と黒。間にある灰色も嫌いじゃないわ、曖昧で正直だから",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "初めて覚えた外国語の単語は、なぜか忘れ物に関する言葉だったの",
+      },
+      {
+        src: "snapper-sad.png",
+        text: "大事なメモほど小さな紙に書いてしまう癖があるの。見つからなくなるのにね",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "研究室の椅子は一番こだわっているわ。腰が命だから",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "昔は天文学者になりたかったの。でも星より、星から届いた言葉の方が気になった",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "雨の日の研究室は少し好き。窓の外がぼやけて、机の上だけが世界みたいになるから",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "本は最後から少しだけ覗いてしまうタイプよ。だいたい作者の思想が漏れていて、見ているのが楽しいの",
+      },
+      {
+        src: "snapper-sad.png",
+        text: "一度だけ、夢で見た単語を朝まで覚えていたのに、意味だけ忘れてしまったわ",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "誰かと一緒に解読するの、実は少し久しぶりなの。だから今、少し楽しいわ",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "ポスドクって、研究者なのに学生でも職員でもない立ち位置なの。肩書きが少し宙に浮いているでしょう",
+      },
+      {
+        src: "snapper-sad.png",
+        text: "任期の更新通知が来るたび、解読結果より先に自分の未来を読んでいる気分になるわ",
+      },
+      {
+        src: "snapper-angry.png",
+        text: "研究費の申請書は、研究そのものより研究の輝かしい未来を説明する時間の方が長いのよ",
+      },
+      {
+        src: "snapper-sad.png",
+        text: "論文の査読コメントって、短い文章なのに一日分の体力を持っていくの。異星語より手強いわ",
+      },
+      {
+        src: "snapper-smile.png",
+        text: "学会では新しい発見より、久しぶりの人に会えることを楽しみにしている自分もいるの",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "指導教員から『面白いね』と言われると嬉しいのに、そのあと必ず『もう少し広げようか』が続くのよ",
+      },
+      {
+        src: "snapper-sad.png",
+        text: "自分の名前で部屋を借りるより先に、研究テーマに名前を付ける人生になってしまったわ",
+      },
+      {
+        src: "snapper-angry.png",
+        text: "実験がうまくいかない日は、データではなく机の引き出しだけが充実していくの",
+      },
+      {
+        src: "snapper-sad.png",
+        text: "ポスドクの悩みは、成果が出るまで待ってほしいのに、任期だけはきちんと進んでしまうことね",
+      },
+      {
+        src: "snapper-normal.png",
+        text: "今の研究が好きだから続けたい。でも好きだけでは申請書の欄が埋まらないのが難しいところよ",
+      },
+    ];
+
+    function updateSnapperScene(entry) {
+      const visual = document.querySelector("#snapper-scene-visual");
+      const device = document.querySelector("#snapper-device");
+      const box = document.querySelector("#snapper-box");
+      const sampleCard = document.querySelector("#snapper-sample-card");
+      const sendButton = document.querySelector("#snapper-send-button");
+      const reply = document.querySelector("#snapper-alien-reply");
+
+      if (!visual || !device || !box || !sampleCard || !sendButton || !reply) {
+        return;
+      }
+
+      const hasScene = Boolean(entry.scene);
+      visual.hidden = !hasScene;
+      device.hidden = entry.scene !== "device" && entry.scene !== "sample";
+      box.hidden = entry.scene !== "box";
+      sampleCard.hidden = entry.scene !== "sample";
+      sendButton.hidden = entry.scene !== "sample" || snapperSampleSent;
+      reply.hidden = entry.scene !== "sample" || !snapperSampleSent;
+
+      if (!prefersReducedMotion && hasScene) {
+        gsap.fromTo(
+          visual,
+          { autoAlpha: 0, y: -4 },
+          { autoAlpha: 1, y: 0, duration: 0.24, ease: "power2.out", overwrite: true },
+        );
+      }
+    }
+
+    function setSnapperCompletionGlyph(visible) {
+      const glyph = document.querySelector("#snapper-completion-glyph");
+
+      if (!glyph) {
+        return;
+      }
+
+      if (snapperCompletionTween) {
+        snapperCompletionTween.kill();
+        snapperCompletionTween = null;
+      }
+
+      if (!visible) {
+        glyph.hidden = true;
+        gsap.set(glyph, { clearProps: "opacity,visibility,transform" });
+        return;
+      }
+
+      glyph.hidden = false;
+
+      if (prefersReducedMotion) {
+        gsap.set(glyph, { autoAlpha: 1, scale: 1, rotation: 0 });
+        return;
+      }
+
+      gsap.fromTo(
+        glyph,
+        { autoAlpha: 0, y: 6, scale: 0.72, rotation: -6 },
+        { autoAlpha: 1, y: 0, scale: 1, rotation: 0, duration: 0.42, ease: "back.out(1.8)" },
+      );
+      snapperCompletionTween = gsap.to(glyph, {
+        y: -4,
+        rotation: 3,
+        scale: 1.03,
+        duration: 1.35,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+        delay: 0.42,
+      });
+    }
+
+    function canAdvanceSnapperDialogue(entry) {
+      return !entry.requiresSend || snapperSampleSent;
+    }
+
+    function pickSnapperSendAside() {
+      if (!snapperSendAsides.length) {
+        return null;
+      }
+
+      let nextIndex = Math.floor(Math.random() * snapperSendAsides.length);
+
+      if (snapperSendAsides.length > 1 && nextIndex === snapperLastAsideIndex) {
+        nextIndex = (nextIndex + 1 + Math.floor(Math.random() * (snapperSendAsides.length - 1))) % snapperSendAsides.length;
+      }
+
+      snapperLastAsideIndex = nextIndex;
+      return snapperSendAsides[nextIndex];
+    }
+
+    function speakSnapperAside(aside) {
+      const character = document.querySelector("#snapper-character");
+      const dialogue = document.querySelector("#snapper-dialogue-text") || document.querySelector("#snapper-dialogue");
+
+      if (!aside || !character || !dialogue) {
+        return;
+      }
+
+      const text = aside.text;
+      const chars = Array.from(text);
+      character.src = aside.src;
+      setSnapperCompletionGlyph(false);
+
+      if (snapperTextTween) {
+        snapperTextTween.kill();
+        snapperTextTween = null;
+      }
+
+      if (prefersReducedMotion) {
+        dialogue.textContent = text;
+        setSnapperCompletionGlyph(true);
+        return;
+      }
+
+      dialogue.textContent = "";
+      gsap.fromTo(
+        character,
+        { y: 4, scale: 0.99 },
+        { y: 0, scale: 1, duration: 0.24, ease: "back.out(1.8)" },
+      );
+
+      const typing = { count: 0 };
+      snapperTextTween = gsap.to(typing, {
+        count: chars.length,
+        duration: Math.max(0.55, Math.min(2, chars.length * 0.026)),
+        ease: "none",
+        onUpdate() {
+          dialogue.textContent = chars.slice(0, Math.round(typing.count)).join("");
+        },
+        onComplete() {
+          dialogue.textContent = text;
+          snapperTextTween = null;
+          setSnapperCompletionGlyph(true);
+        },
+      });
+    }
+
+    function normalizeSnapperSo(value) {
+      return String(value || "")
+        .replace(/[’]/g, "'")
+        .replace(/u'/g, "h")
+        .trim();
+    }
+
+    function getSnapperReplyFromPayload(payload) {
+      if (!payload || typeof payload !== "object") {
+        return "";
+      }
+
+      return normalizeSnapperSo(payload.so || payload.reply || payload.message || payload.text || payload.result);
+    }
+
+    function getMockSnapperReply() {
+      return "vose linoa furo eso";
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => window.setTimeout(resolve, ms));
+    }
+
+    async function requestSnapperDescription(file) {
+      const minimumLoadingTime = wait(1050);
+      const canUseApi = window.location.protocol === "http:" || window.location.protocol === "https:";
+
+      if (canUseApi && file) {
+        try {
+          const formData = new FormData();
+          formData.append("image", file);
+
+          const response = await fetch("/api/describe", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (response.ok) {
+            const payload = await response.json();
+            const reply = getSnapperReplyFromPayload(payload);
+
+            if (reply) {
+              await minimumLoadingTime;
+              return reply;
+            }
+          }
+        } catch {
+          // The Worker API is optional for now; the UI keeps working with a local reply.
+        }
+      }
+
+      await minimumLoadingTime;
+      return getMockSnapperReply();
+    }
+
+    function setSnapperUplinkLoading(isLoading) {
+      const loading = document.querySelector("#snapper-loading");
+      const sendButton = document.querySelector("#snapper-uplink-send");
+      const fileInput = document.querySelector("#snapper-image-input");
+
+      snapperUplinkBusy = isLoading;
+
+      if (loading) {
+        loading.hidden = !isLoading;
+
+        if (isLoading && !prefersReducedMotion) {
+          gsap.fromTo(loading, { autoAlpha: 0, y: 4 }, { autoAlpha: 1, y: 0, duration: 0.24, ease: "power2.out" });
+        }
+      }
+
+      if (sendButton) {
+        sendButton.disabled = isLoading || !snapperSelectedImageFile;
+      }
+
+      if (fileInput) {
+        fileInput.disabled = isLoading;
+      }
+    }
+
+    function showSnapperUplink() {
+      const conversation = document.querySelector(".snapper-conversation");
+      const uplink = document.querySelector("#snapper-uplink");
+
+      if (!conversation || !uplink) {
+        return;
+      }
+
+      snapperUplinkVisible = true;
+      uplink.hidden = false;
+      conversation.classList.add("is-uplink");
+      updateSnapperScene({});
+      setSnapperCompletionGlyph(false);
+
+      if (!prefersReducedMotion) {
+        gsap.fromTo(
+          uplink,
+          { autoAlpha: 0, y: 8, scale: 0.98 },
+          { autoAlpha: 1, y: 0, scale: 1, duration: 0.36, ease: "back.out(1.7)", overwrite: true },
+        );
+      }
+    }
+
+    function clearSnapperUplinkResult() {
+      const result = document.querySelector("#snapper-uplink-result");
+
+      if (result) {
+        result.hidden = true;
+        result.textContent = "";
+      }
+    }
+
+    function setSnapperSelectedImage(file) {
+      const previewImage = document.querySelector("#snapper-uplink-image");
+      const placeholder = document.querySelector("#snapper-uplink-placeholder");
+      const sendButton = document.querySelector("#snapper-uplink-send");
+
+      if (snapperSelectedImageUrl) {
+        URL.revokeObjectURL(snapperSelectedImageUrl);
+        snapperSelectedImageUrl = "";
+      }
+
+      snapperSelectedImageFile = file || null;
+      clearSnapperUplinkResult();
+      setSnapperUplinkLoading(false);
+
+      if (!previewImage || !placeholder || !sendButton) {
+        return;
+      }
+
+      if (!file) {
+        previewImage.hidden = true;
+        previewImage.removeAttribute("src");
+        placeholder.hidden = false;
+        sendButton.disabled = true;
+        return;
+      }
+
+      snapperSelectedImageUrl = URL.createObjectURL(file);
+      previewImage.src = snapperSelectedImageUrl;
+      previewImage.hidden = false;
+      placeholder.hidden = true;
+      sendButton.disabled = false;
+
+      if (!prefersReducedMotion) {
+        gsap.fromTo(previewImage, { autoAlpha: 0, scale: 1.04 }, { autoAlpha: 1, scale: 1, duration: 0.26, ease: "power2.out" });
+      }
+    }
+
+    async function sendSnapperSelectedImage() {
+      const result = document.querySelector("#snapper-uplink-result");
+
+      if (!snapperSelectedImageFile || snapperUplinkBusy || !result) {
+        return;
+      }
+
+      clearSnapperUplinkResult();
+      setSnapperUplinkLoading(true);
+      speakSnapperAside(pickSnapperSendAside());
+
+      const reply = await requestSnapperDescription(snapperSelectedImageFile);
+
+      setSnapperUplinkLoading(false);
+      result.textContent = reply;
+      result.hidden = false;
+
+      if (!prefersReducedMotion) {
+        gsap.fromTo(result, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.3, ease: "back.out(1.7)" });
+      }
+    }
+
+    function initSnapperUploader() {
+      const uplink = document.querySelector("#snapper-uplink");
+      const fileInput = document.querySelector("#snapper-image-input");
+      const sendButton = document.querySelector("#snapper-uplink-send");
+
+      if (!uplink || !fileInput || !sendButton) {
+        return;
+      }
+
+      uplink.addEventListener("click", (event) => event.stopPropagation());
+
+      fileInput.addEventListener("change", () => {
+        const [file] = Array.from(fileInput.files || []);
+        setSnapperSelectedImage(file);
+      });
+
+      sendButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        sendSnapperSelectedImage();
+      });
+    }
+
+    function renderSnapperDialogue(index, options = {}) {
+      const character = document.querySelector("#snapper-character");
+      const dialogue = document.querySelector("#snapper-dialogue-text") || document.querySelector("#snapper-dialogue");
+
+      if (!character || !dialogue || !snapperDialogueScript.length) {
+        return;
+      }
+
+      snapperDialogueIndex = Math.max(0, Math.min(index, snapperDialogueScript.length - 1));
+      const entry = snapperDialogueScript[snapperDialogueIndex];
+      const text = entry.text;
+      const chars = Array.from(text);
+      character.src = entry.src;
+      updateSnapperScene(entry);
+      setSnapperCompletionGlyph(false);
+
+      if (snapperTextTween) {
+        snapperTextTween.kill();
+        snapperTextTween = null;
+      }
+
+      if (prefersReducedMotion || options.instant) {
+        dialogue.textContent = text;
+        setSnapperCompletionGlyph(canAdvanceSnapperDialogue(entry));
+        return;
+      }
+
+      dialogue.textContent = "";
+      gsap.fromTo(
+        character,
+        { y: 5, scale: 0.98 },
+        { y: 0, scale: 1, duration: 0.28, ease: "back.out(1.8)" },
+      );
+
+      const typing = { count: 0 };
+      snapperTextTween = gsap.to(typing, {
+        count: chars.length,
+        duration: Math.max(0.55, Math.min(2.2, chars.length * 0.028)),
+        ease: "none",
+        onUpdate() {
+          dialogue.textContent = chars.slice(0, Math.round(typing.count)).join("");
+        },
+        onComplete() {
+          dialogue.textContent = text;
+          snapperTextTween = null;
+          setSnapperCompletionGlyph(canAdvanceSnapperDialogue(entry));
+        },
+      });
+    }
+
+    function advanceSnapperDialogue(step) {
+      if (snapperUplinkVisible) {
+        return;
+      }
+
+      if (snapperTextTween) {
+        snapperTextTween.progress(1);
+        return;
+      }
+
+      if (step > 0 && snapperDialogueIndex >= snapperDialogueScript.length - 1) {
+        showSnapperUplink();
+        return;
+      }
+
+      const entry = snapperDialogueScript[snapperDialogueIndex];
+
+      if (step > 0 && entry && entry.requiresSend && !snapperSampleSent) {
+        const sendButton = document.querySelector("#snapper-send-button");
+
+        if (sendButton && !prefersReducedMotion) {
+          gsap.fromTo(sendButton, { scale: 0.96 }, { scale: 1, duration: 0.22, ease: "back.out(2)" });
+        }
+
+        return;
+      }
+
+      renderSnapperDialogue(snapperDialogueIndex + step);
+    }
+
+    function playSnapperDialogue() {
+      renderSnapperDialogue(snapperDialogueIndex);
+    }
+
+    function initSnapperDialogue() {
+      const conversation = document.querySelector(".snapper-conversation");
+      const sendButton = document.querySelector("#snapper-send-button");
+
+      if (!conversation || !sendButton) {
+        return;
+      }
+
+      initSnapperUploader();
+
+      conversation.addEventListener("click", () => advanceSnapperDialogue(1));
+      conversation.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          advanceSnapperDialogue(1);
+        }
+      });
+      sendButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        snapperSampleSent = true;
+        updateSnapperScene(snapperDialogueScript[snapperDialogueIndex]);
+
+        const reply = document.querySelector("#snapper-alien-reply");
+
+        if (reply && !prefersReducedMotion) {
+          gsap.fromTo(reply, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.28, ease: "back.out(1.7)" });
+        }
+
+        setSnapperCompletionGlyph(true);
+      });
+
+      renderSnapperDialogue(0, { instant: true });
     }
 
     windows.forEach((windowEl) => {
@@ -1603,22 +2295,23 @@
       }
 
       const [, action, target] =
-        command.match(/^(open|focus|close|minimize)\s+(readme|terminal)$/) || [];
+        command.match(/^(open|focus|close|minimize)\s+(readme|contact|snapper|terminal)$/) || [];
+      const windowTarget = target === "contact" ? "snapper" : target;
 
       if (action === "open" || action === "focus") {
-        openWindow(target);
+        openWindow(windowTarget);
         appendTerminal(`${target} focused`);
         return;
       }
 
       if (action === "close") {
-        closeWindow(findWindow(target));
+        closeWindow(findWindow(windowTarget));
         appendTerminal(`${target} closed`);
         return;
       }
 
       if (action === "minimize") {
-        minimizeWindow(findWindow(target));
+        minimizeWindow(findWindow(windowTarget));
         appendTerminal(`${target} minimized`);
         return;
       }
@@ -1660,6 +2353,7 @@
     }
 
     initWaveMesh();
+    initSnapperDialogue();
     syncBrandWidth();
     initWatercolorCanvas();
     updateClock();

@@ -24,6 +24,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Madoufmg";
+  src: url("madoufmg.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   --desktop-accent: #8a8a8a;
   --desktop-glow: 12px;
@@ -353,6 +361,36 @@ button {
   box-shadow: none;
 }
 
+.snapper-glyph {
+  display: grid;
+  place-items: center;
+  border-color: transparent;
+  background: transparent;
+  color: #ffffff;
+  font-family: "Soo", serif;
+  font-weight: 400;
+  line-height: 1;
+  box-shadow: none;
+  text-shadow:
+    0 0 9px rgba(255, 255, 255, 0.2),
+    0 2px 7px rgba(0, 0, 0, 0.48);
+}
+
+.icon-glyph.snapper-glyph {
+  width: 44px;
+  height: 54px;
+  font-size: 2.9rem;
+  transform: translateX(-4px);
+}
+
+.title-icon.snapper-glyph {
+  width: 18px;
+  height: 18px;
+  font-size: 1.02rem;
+  text-shadow: none;
+  transform: translateX(-1px);
+}
+
 .os-window {
   position: absolute;
   z-index: 4;
@@ -423,6 +461,13 @@ button {
   left: min(638px, 52vw);
   width: min(430px, calc(100vw - 204px));
   height: 238px;
+}
+
+.snapper-window {
+  top: 116px;
+  left: min(520px, 44vw);
+  width: min(500px, calc(100vw - 190px));
+  height: 430px;
 }
 
 .browser-window {
@@ -546,6 +591,499 @@ button {
 
 .notes-body textarea:focus {
   border-color: rgba(255, 255, 255, 0.3);
+}
+
+.snapper-body {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 42%),
+    #101010;
+}
+
+.snapper-conversation {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(ellipse at 50% 88%, rgba(255, 255, 255, 0.09), transparent 46%),
+    linear-gradient(180deg, #1b1b1b 0%, #080808 100%);
+  cursor: pointer;
+}
+
+.snapper-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: start center;
+  padding: 0 18px 92px 76px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.snapper-character {
+  display: block;
+  width: 226px;
+  max-width: 100%;
+  height: auto;
+  margin-top: -58px;
+  margin-left: 148px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.48));
+}
+
+.snapper-dialogue-panel {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
+  z-index: 3;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 9px;
+  min-width: 0;
+  min-height: 112px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius);
+  background: rgba(5, 5, 5, 0.86);
+  color: #f7f7f7;
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.34),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(5px);
+  cursor: pointer;
+}
+
+.snapper-scene-visual {
+  position: absolute;
+  top: 18px;
+  left: 24px;
+  z-index: 4;
+  display: block;
+  width: 236px;
+  height: 176px;
+  pointer-events: none;
+}
+
+.snapper-scene-visual[hidden],
+.snapper-device[hidden],
+.snapper-box[hidden],
+.snapper-sample-card[hidden],
+.snapper-send-button[hidden],
+.snapper-alien-reply[hidden],
+.snapper-uplink[hidden],
+.snapper-uplink-image[hidden],
+.snapper-loading[hidden],
+.snapper-uplink-result[hidden] {
+  display: none;
+}
+
+.snapper-device {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: block;
+  width: 148px;
+  height: auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.42));
+  transform: translate(-50%, -50%);
+}
+
+.snapper-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: block;
+  width: 148px;
+  height: auto;
+  image-rendering: pixelated;
+  filter:
+    drop-shadow(0 8px 10px rgba(0, 0, 0, 0.42))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.1));
+  transform: translate(-50%, -50%);
+}
+
+.snapper-sample-card {
+  position: absolute;
+  top: 22px;
+  left: 38px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 164px;
+  height: 100px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.46);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 12px 24px rgba(0, 0, 0, 0.22);
+}
+
+.snapper-sample-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.snapper-send-button {
+  position: absolute;
+  left: 58px;
+  bottom: 22px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 122px;
+  height: 31px;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #ffffff;
+  font-family: "Madoufmg", "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  line-height: 1;
+  pointer-events: auto;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+
+.snapper-send-button:hover,
+.snapper-send-button:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.46);
+  outline-offset: 2px;
+}
+
+.snapper-send-button img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  image-rendering: pixelated;
+}
+
+.snapper-send-button span {
+  position: relative;
+  z-index: 1;
+}
+
+.snapper-alien-reply {
+  position: absolute;
+  top: 66px;
+  left: 34px;
+  z-index: 4;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.58);
+  color: #ffffff;
+  font-family: "Soo", serif;
+  font-size: 1.18rem;
+  line-height: 1.1;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.22);
+}
+
+.snapper-uplink {
+  position: absolute;
+  top: 18px;
+  left: 22px;
+  z-index: 5;
+  display: grid;
+  width: 258px;
+  gap: 10px;
+  padding: 10px;
+  max-height: calc(100% - 150px);
+  overflow: hidden auto;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 54%),
+    rgba(4, 4, 4, 0.82);
+  box-shadow:
+    0 18px 34px rgba(0, 0, 0, 0.34),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  pointer-events: auto;
+  cursor: default;
+}
+
+.snapper-conversation.is-uplink .snapper-dialogue-panel {
+  opacity: 0.84;
+}
+
+.snapper-uplink-preview {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.12), transparent 35%),
+    #080808;
+}
+
+.snapper-uplink-preview::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: calc(var(--radius) - 2px);
+  background:
+    linear-gradient(90deg, transparent 0 31%, rgba(255, 255, 255, 0.15) 31% 32%, transparent 32% 65%, rgba(255, 255, 255, 0.12) 65% 66%, transparent 66%),
+    linear-gradient(180deg, transparent 0 47%, rgba(255, 255, 255, 0.14) 47% 48%, transparent 48%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.snapper-uplink-image {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  padding: 6px;
+}
+
+.snapper-uplink-placeholder {
+  position: relative;
+  z-index: 1;
+  color: #ffffff;
+  font-family: "Soo", serif;
+  font-size: 2.8rem;
+  line-height: 1;
+  text-shadow:
+    0 0 14px rgba(255, 255, 255, 0.22),
+    0 10px 20px rgba(0, 0, 0, 0.58);
+}
+
+.snapper-uplink-controls {
+  display: grid;
+  grid-template-columns: 112px 112px;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.snapper-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.snapper-file-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 29px;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: url("snapper-send.png") center / 100% 100% no-repeat;
+  color: #ffffff;
+  font-family: "Madoufmg", "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 0.76rem;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+  user-select: none;
+  cursor: pointer;
+  image-rendering: pixelated;
+}
+
+.snapper-file-button:hover,
+.snapper-file-button:focus-within,
+.snapper-uplink-send:hover,
+.snapper-uplink-send:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.44);
+  outline-offset: 2px;
+}
+
+.snapper-file-button-mobile {
+  display: none;
+}
+
+.snapper-uplink-send {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 29px;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  font-family: "Madoufmg", "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 0.76rem;
+  line-height: 1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+  cursor: pointer;
+}
+
+.snapper-uplink-send:disabled {
+  opacity: 0.44;
+  cursor: default;
+}
+
+.snapper-uplink-send img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  image-rendering: pixelated;
+}
+
+.snapper-uplink-send span {
+  position: relative;
+  z-index: 1;
+}
+
+.snapper-loading {
+  display: grid;
+  place-items: center;
+  min-height: 58px;
+}
+
+.snapper-loading-logo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  color: #ffffff;
+  font-family: "Soo", serif;
+  font-size: 1.86rem;
+  line-height: 1;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.26);
+  animation: snapperLoadingLogo 1.4s ease-in-out infinite;
+}
+
+.snapper-loading-logo::before,
+.snapper-loading-logo::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.snapper-loading-logo::before {
+  inset: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+}
+
+.snapper-loading-logo::after {
+  inset: 2px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.96) 0 3px, transparent 4px),
+    radial-gradient(circle at 90% 28%, rgba(255, 255, 255, 0.7) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 82%, rgba(255, 255, 255, 0.82) 0 2.5px, transparent 3.5px),
+    radial-gradient(circle at 14% 68%, rgba(255, 255, 255, 0.58) 0 2px, transparent 3px);
+  box-shadow:
+    0 0 12px rgba(255, 255, 255, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  animation: snapperLoadingOrbit 1.45s linear infinite;
+}
+
+.snapper-uplink-result {
+  margin: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.56);
+  color: #ffffff;
+  font-family: "Soo", serif;
+  font-size: 1.12rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes snapperLoadingLogo {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-2px) scale(1.04);
+  }
+}
+
+@keyframes snapperLoadingOrbit {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.snapper-speaker {
+  margin: 0;
+  color: #a9a9a9;
+  font-family: "Madoufmg", "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.snapper-dialogue {
+  margin: 0;
+  align-self: start;
+  overflow-wrap: anywhere;
+  color: #ffffff;
+  font-family: "Madoufmg", "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 1.08rem;
+  font-weight: 400;
+  line-height: 1.55;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+}
+
+.snapper-completion-glyph {
+  display: inline-block;
+  margin-left: 0.1em;
+  color: #ffffff;
+  font-family: "Soo", serif;
+  font-size: 1.08em;
+  font-weight: 400;
+  line-height: 0.88;
+  vertical-align: -0.04em;
+  pointer-events: none;
+  text-shadow:
+    0 0 12px rgba(255, 255, 255, 0.28),
+    0 14px 24px rgba(0, 0, 0, 0.5);
+  transform-origin: 50% 54%;
+}
+
+.snapper-completion-glyph[hidden] {
+  display: none;
 }
 
 .window-actions {
@@ -1120,6 +1658,7 @@ body[data-error="gsap"]::before {
   .notes-window,
   .files-window,
   .studio-window,
+  .snapper-window,
   .terminal-window,
   .browser-window {
     left: 112px;
@@ -1136,6 +1675,10 @@ body[data-error="gsap"]::before {
 
   .terminal-window {
     top: min(448px, calc(100vh - 304px));
+  }
+
+  .snapper-window {
+    top: 116px;
   }
 
   .browser-window {
@@ -1187,6 +1730,7 @@ body[data-error="gsap"]::before {
   .notes-window,
   .files-window,
   .studio-window,
+  .snapper-window,
   .terminal-window,
   .browser-window {
     left: 12px;
@@ -1206,6 +1750,156 @@ body[data-error="gsap"]::before {
   .studio-window {
     top: 452px;
     height: 210px;
+  }
+
+  .snapper-window {
+    top: 126px;
+    height: 454px;
+  }
+
+  .snapper-body {
+    padding: 12px;
+  }
+
+  .snapper-conversation {
+    min-height: 0;
+  }
+
+  .snapper-stage {
+    padding: 0 10px 94px 42px;
+  }
+
+  .snapper-character {
+    width: 168px;
+    margin-top: -38px;
+    margin-left: 82px;
+  }
+
+  .snapper-dialogue-panel {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    min-height: 112px;
+    padding: 10px;
+  }
+
+  .snapper-scene-visual {
+    top: 10px;
+    left: 10px;
+    width: 206px;
+    height: 146px;
+  }
+
+  .snapper-device {
+    width: 116px;
+  }
+
+  .snapper-box {
+    width: 116px;
+  }
+
+  .snapper-sample-card {
+    top: 18px;
+    left: 36px;
+    width: 132px;
+    height: 82px;
+  }
+
+  .snapper-send-button {
+    left: 50px;
+    bottom: 18px;
+    width: 102px;
+    height: 26px;
+    font-size: 0.72rem;
+  }
+
+  .snapper-alien-reply {
+    top: 54px;
+    left: 28px;
+    padding: 7px 8px;
+    font-size: 1rem;
+  }
+
+  .snapper-uplink {
+    top: 8px;
+    right: auto;
+    left: 8px;
+    width: min(326px, calc(100% - 16px));
+    gap: 8px;
+    padding: 8px;
+    max-height: calc(100% - 140px);
+  }
+
+  .snapper-uplink-preview {
+    height: 104px;
+  }
+
+  .snapper-uplink-controls {
+    grid-template-columns: 104px 104px;
+    gap: 7px;
+  }
+
+  .snapper-file-button {
+    width: 104px;
+    height: 24px;
+    font-size: 0.68rem;
+  }
+
+  .snapper-file-button-desktop {
+    display: none;
+  }
+
+  .snapper-file-button-mobile {
+    display: inline;
+  }
+
+  .snapper-uplink-send {
+    width: 104px;
+    height: 24px;
+    font-size: 0.68rem;
+  }
+
+  .snapper-loading {
+    min-height: 42px;
+  }
+
+  .snapper-loading-logo {
+    width: 42px;
+    height: 42px;
+    font-size: 1.36rem;
+  }
+
+  .snapper-loading-logo::before {
+    border-radius: 999px;
+  }
+
+  .snapper-loading-logo::after {
+    inset: 1px;
+    width: auto;
+    height: auto;
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.96) 0 2.5px, transparent 3.5px),
+      radial-gradient(circle at 90% 28%, rgba(255, 255, 255, 0.7) 0 1.8px, transparent 2.8px),
+      radial-gradient(circle at 78% 82%, rgba(255, 255, 255, 0.82) 0 2px, transparent 3px),
+      radial-gradient(circle at 14% 68%, rgba(255, 255, 255, 0.58) 0 1.8px, transparent 2.8px);
+    box-shadow:
+      0 0 10px rgba(255, 255, 255, 0.16),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+
+  .snapper-uplink-result {
+    min-height: 34px;
+    padding: 7px 8px;
+    font-size: 0.98rem;
+  }
+
+  .snapper-dialogue {
+    font-size: 0.92rem;
+  }
+
+  .snapper-completion-glyph {
+    font-size: 1em;
   }
 
   .terminal-window {
