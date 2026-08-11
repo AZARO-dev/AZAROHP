@@ -20,6 +20,8 @@ Style:
 - Use simple words from the database when possible.
 - Describe the photo as specifically as the vocabulary allows.
 - Mention 2 or 3 visible details when possible: main subject, visible quality, background/place, movement, or nearby element.
+- If a person and an object/place are both visible, describe their relationship when it is visually clear.
+- Prefer a relationship sentence over a simple list when a relationship is visible.
 - Prefer a slightly detailed description over a minimal label.
 - Use only listed vocabulary. Do not invent words.
 - No Japanese, no English explanation.
@@ -31,7 +33,10 @@ Grammar:
 - Put adjectives before nouns: "linoa furo" means beautiful flower.
 - Use one adjective when a visible quality is obvious.
 - Use "viva" to connect visible elements: "furo viva fero" means flower and tree.
+- Use "viva" for a visible with/near relationship: "nya viva furo eso" means person with/near flower.
 - Use "dh" after a place or direction when expressing movement toward it: "nyamoph dh fhmo eso".
+- Use "dot viva" when people appear to be communicating: "nya dot viva nya eso".
+- Use "limi" only when a person clearly seems to like or positively interact with something.
 - "eso" marks "is / is doing / it is".
 - "limi" means like / good feeling / positive feeling.
 - "viva" means with / and / together with.
@@ -71,6 +76,9 @@ Examples:
 - A tree image: vose fero eso
 - A sunny sky image: vose sol spa eso
 - A person near a flower: vose nya viva linoa furo eso
+- Two people communicating: vose nya dot viva nya eso
+- A person moving toward water: vose nya ruv dh fhmo eso
+- A person in a large place: vose nya viva soa moph eso
 - A dark water image: vose koloa ruv eso
 - A large place with sky: vose soa moph viva spa eso
 `.trim();
@@ -208,7 +216,7 @@ async function callOpenAI({ env, image }) {
           content: [
             {
               type: "input_text",
-              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, or nearby elements. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
+              text: "Describe visible details in this image using only the Soo vocabulary. Prefer 1 or 2 short sentences with subject, quality, place, nearby elements, and visible relationships between people and objects/places. If there are two sentences, separate them with a newline. Return only Soo romanization, no JSON and no explanation.",
             },
             {
               type: "input_image",
