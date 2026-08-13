@@ -1976,6 +1976,111 @@
       renderSnapperDialogue(0, { instant: true });
     }
 
+    function initBoxKeyboard() {
+      const answer = document.querySelector("#box-answer");
+      const problemText = document.querySelector("#box-problem-text");
+      const problemCount = document.querySelector("#box-problem-count");
+      const result = document.querySelector("#box-result");
+      const keys = Array.from(document.querySelectorAll("[data-box-key], [data-box-action]"));
+      const boxProblems = [
+        {
+          prompt: "linoa furo eso",
+          answer: "furo",
+        },
+        {
+          prompt: "soa moph eso",
+          answer: "moph",
+        },
+        {
+          prompt: "nya nopa furo limi",
+          answer: "limi",
+        },
+        {
+          prompt: "stua fero viva ruv eso",
+          answer: "fero ruv",
+        },
+      ];
+      let currentProblemIndex = 0;
+
+      function normalizeBoxAnswer(value) {
+        return value.trim().replace(/\s+/g, " ");
+      }
+
+      function renderBoxProblem() {
+        const problem = boxProblems[currentProblemIndex];
+
+        if (problemText) {
+          problemText.textContent = problem.prompt;
+        }
+
+        if (problemCount) {
+          problemCount.textContent = `${String(currentProblemIndex + 1).padStart(2, "0")} / ${String(boxProblems.length).padStart(2, "0")}`;
+        }
+
+        answer.textContent = "";
+
+        if (result) {
+          result.textContent = "";
+          result.classList.remove("is-correct", "is-wrong");
+        }
+      }
+
+      function judgeBoxAnswer() {
+        const problem = boxProblems[currentProblemIndex];
+        const isCorrect = normalizeBoxAnswer(answer.textContent) === problem.answer;
+
+        if (result) {
+          result.textContent = isCorrect ? "○" : "×";
+          result.classList.toggle("is-correct", isCorrect);
+          result.classList.toggle("is-wrong", !isCorrect);
+        }
+
+        if (!isCorrect) {
+          return;
+        }
+
+        window.setTimeout(() => {
+          currentProblemIndex = (currentProblemIndex + 1) % boxProblems.length;
+          renderBoxProblem();
+        }, 620);
+      }
+
+      if (!answer || !keys.length || !boxProblems.length) {
+        return;
+      }
+
+      renderBoxProblem();
+
+      keys.forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+
+          if (button.dataset.boxAction === "backspace") {
+            answer.textContent = answer.textContent.slice(0, -1);
+
+            if (result) {
+              result.textContent = "";
+              result.classList.remove("is-correct", "is-wrong");
+            }
+
+            return;
+          }
+
+          if (button.dataset.boxAction === "enter") {
+            judgeBoxAnswer();
+            return;
+          }
+
+          answer.textContent = `${answer.textContent}${button.dataset.boxKey}`;
+
+          if (result) {
+            result.textContent = "";
+            result.classList.remove("is-correct", "is-wrong");
+          }
+        });
+      });
+    }
+
     windows.forEach((windowEl) => {
       windowEl.addEventListener("pointerdown", () => focusWindow(windowEl.dataset.window));
 
@@ -2371,7 +2476,7 @@
       }
 
       const [, action, target] =
-        command.match(/^(open|focus|close|minimize)\s+(readme|contact|snapper|terminal)$/) || [];
+        command.match(/^(open|focus|close|minimize)\s+(readme|contact|snapper|box|terminal)$/) || [];
       const windowTarget = target === "contact" ? "snapper" : target;
 
       if (action === "open" || action === "focus") {
@@ -2430,6 +2535,7 @@
 
     initWaveMesh();
     initSnapperDialogue();
+    initBoxKeyboard();
     syncBrandWidth();
     initWatercolorCanvas();
     updateClock();

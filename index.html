@@ -65,11 +65,15 @@
           <span class="icon-glyph snapper-glyph" aria-hidden="true">g</span>
           <span>CONTACT</span>
         </button>
-        <button class="desktop-icon" type="button" data-url="https://graphophony.pages.dev/" style="--icon-x: 22px; --icon-y: 334px;" aria-label="Open Graph">
+        <button class="desktop-icon" type="button" data-window-target="box" style="--icon-x: 22px; --icon-y: 334px;" aria-label="Open BOX">
+          <span class="icon-glyph box-glyph" aria-hidden="true"><img src="box-icon.png" alt=""></span>
+          <span>BOX</span>
+        </button>
+        <button class="desktop-icon" type="button" data-url="https://graphophony.pages.dev/" style="--icon-x: 22px; --icon-y: 438px;" aria-label="Open Graph">
           <span class="icon-glyph url-glyph" aria-hidden="true">r</span>
           <span>Graph</span>
         </button>
-        <button class="desktop-icon" type="button" data-url="https://manusorganum.pages.dev/" style="--icon-x: 22px; --icon-y: 438px;" aria-label="Open Manus Organum">
+        <button class="desktop-icon" type="button" data-url="https://manusorganum.pages.dev/" style="--icon-x: 22px; --icon-y: 542px;" aria-label="Open Manus Organum">
           <span class="icon-glyph url-glyph" aria-hidden="true">m</span>
           <span>Manus Organum</span>
         </button>
@@ -171,6 +175,53 @@
         </div>
       </section>
 
+      <section class="os-window box-window" data-window="box" aria-label="BOX window">
+        <header class="window-titlebar">
+          <div class="window-title">
+            <span class="title-icon box-glyph" aria-hidden="true"><img src="box-icon.png" alt=""></span>
+            <strong>BOX</strong>
+          </div>
+          <div class="window-controls" aria-label="Window controls">
+            <button type="button" data-os-action="minimize" aria-label="最小化">_</button>
+            <button type="button" data-os-action="maximize" aria-label="最大化">□</button>
+            <button type="button" data-os-action="close" aria-label="閉じる">×</button>
+          </div>
+        </header>
+        <div class="window-body box-body">
+          <section class="box-problem" aria-label="Soo problem text">
+            <p class="box-problem-count" id="box-problem-count">01 / 04</p>
+            <p class="box-problem-text" id="box-problem-text">linoa furo eso</p>
+          </section>
+          <section class="box-keyboard" aria-label="Soo keyboard">
+            <output class="box-answer" id="box-answer" aria-live="polite"></output>
+            <p class="box-result" id="box-result" aria-live="polite"></p>
+            <div class="box-key-grid">
+              <button type="button" data-box-key="a">a</button>
+              <button type="button" data-box-key="d">d</button>
+              <button type="button" data-box-key="e">e</button>
+              <button type="button" data-box-key="f">f</button>
+              <button type="button" data-box-key="h">h</button>
+              <button type="button" data-box-key="i">i</button>
+              <button type="button" data-box-key="l">l</button>
+              <button type="button" data-box-key="m">m</button>
+              <button type="button" data-box-key="n">n</button>
+              <button type="button" data-box-key="o">o</button>
+              <button type="button" data-box-key="p">p</button>
+              <button type="button" data-box-key="r">r</button>
+              <button type="button" data-box-key="s">s</button>
+              <button type="button" data-box-key="t">t</button>
+              <button type="button" data-box-key="u">u</button>
+              <button type="button" data-box-key="v">v</button>
+              <button type="button" data-box-key="y">y</button>
+              <button type="button" data-box-key="z">z</button>
+              <button class="box-key-command" type="button" data-box-action="backspace" aria-label="Backspace">←</button>
+              <button class="box-key-command" type="button" data-box-key=" ">space</button>
+              <button class="box-key-command" type="button" data-box-action="enter" aria-label="Enter">↵</button>
+            </div>
+          </section>
+        </div>
+      </section>
+
       <section class="os-window files-window" data-window="files" aria-label="Files window" hidden>
         <header class="window-titlebar">
           <div class="window-title">
@@ -242,7 +293,7 @@
         </header>
         <div class="window-body terminal-body">
           <pre id="terminal-log">terminal ready
-try: open readme, open contact, focus terminal, pulse</pre>
+try: open readme, open contact, open box, focus terminal, pulse</pre>
           <form id="terminal-form">
             <label class="sr-only" for="terminal-input">Command</label>
             <span>&gt;</span>
