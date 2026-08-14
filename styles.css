@@ -2325,8 +2325,11 @@ body[data-error="gsap"]::before {
   }
 
   .snapper-uplink-result {
-    min-height: 34px;
-    padding: 7px 8px;
+    min-height: 0;
+    padding: 3px 0 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
     font-size: 0.88rem;
     line-height: 1.28;
   }
