@@ -1599,7 +1599,7 @@
       const typing = { count: 0 };
       snapperTextTween = gsap.to(typing, {
         count: chars.length,
-        duration: Math.max(0.55, Math.min(2, chars.length * 0.026)),
+        duration: Math.max(0.85, Math.min(3.2, chars.length * 0.04)),
         ease: "none",
         onUpdate() {
           dialogue.textContent = chars.slice(0, Math.round(typing.count)).join("");
@@ -1648,7 +1648,7 @@
     }
 
     async function requestSnapperDescription(file) {
-      const minimumLoadingTime = wait(1050);
+      const minimumLoadingTime = wait(2200);
       const canUseApi = window.location.protocol === "http:" || window.location.protocol === "https:";
 
       if (canUseApi && file) {
@@ -1941,7 +1941,7 @@
       const typing = { count: 0 };
       snapperTextTween = gsap.to(typing, {
         count: chars.length,
-        duration: Math.max(0.55, Math.min(2.2, chars.length * 0.028)),
+        duration: Math.max(0.85, Math.min(3.4, chars.length * 0.04)),
         ease: "none",
         onUpdate() {
           dialogue.textContent = chars.slice(0, Math.round(typing.count)).join("");
@@ -2008,7 +2008,7 @@
       const typing = { count: 0 };
       snapperTextTween = gsap.to(typing, {
         count: chars.length,
-        duration: Math.max(0.55, Math.min(2.2, chars.length * 0.028)),
+        duration: Math.max(0.85, Math.min(3.4, chars.length * 0.04)),
         ease: "none",
         onUpdate() {
           dialogue.textContent = chars.slice(0, Math.round(typing.count)).join("");
