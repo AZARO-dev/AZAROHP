@@ -958,7 +958,7 @@
       syncTaskbar(name);
     }
 
-    function openWindow(name) {
+    function openWindow(name, options = {}) {
       const windowEl = findWindow(name);
 
       if (!windowEl) {
@@ -967,6 +967,11 @@
 
       const wasOpen = windowEl.classList.contains("is-open");
       const currentY = gsap.getProperty(windowEl, "y");
+
+      if (name === "snapper" && !options.preserveSnapperMode) {
+        restoreSnapperContactMode();
+      }
+
       focusWindow(name);
 
       if (!prefersReducedMotion && !wasOpen) {
@@ -979,7 +984,7 @@
         gsap.set(windowEl, { autoAlpha: 1, scale: 1 });
       }
 
-      if (name === "snapper" && !wasOpen) {
+      if (name === "snapper" && !wasOpen && !snapperBoxUnlockActive) {
         playSnapperDialogue();
       }
     }
@@ -1221,6 +1226,9 @@
     let snapperSelectedImageFile = null;
     let snapperSelectedImageUrl = "";
     let snapperLastAsideIndex = -1;
+    let snapperBoxUnlockActive = false;
+    let snapperBoxUnlockIndex = 0;
+    let snapperBoxUnlockStarted = false;
 
     const snapperDialogueScript = [
       {
@@ -1453,6 +1461,18 @@
       },
     ];
 
+    const snapperBoxUnlockScript = [
+      {
+        src: "snapper-smile.png",
+        text: "箱の第一段階が解けたみたいね！流石だわ！",
+      },
+      {
+        src: "snapper-normal.png",
+        scene: "vocab",
+        text: "私も独自で単語を集めてみたの、良かったら参考にしてほしいわ",
+      },
+    ];
+
     function updateSnapperScene(entry) {
       const visual = document.querySelector("#snapper-scene-visual");
       const device = document.querySelector("#snapper-device");
@@ -1460,8 +1480,9 @@
       const sampleCard = document.querySelector("#snapper-sample-card");
       const sendButton = document.querySelector("#snapper-send-button");
       const reply = document.querySelector("#snapper-alien-reply");
+      const vocabCard = document.querySelector("#snapper-vocab-card");
 
-      if (!visual || !device || !box || !sampleCard || !sendButton || !reply) {
+      if (!visual || !device || !box || !sampleCard || !sendButton || !reply || !vocabCard) {
         return;
       }
 
@@ -1472,6 +1493,7 @@
       sampleCard.hidden = entry.scene !== "sample";
       sendButton.hidden = entry.scene !== "sample" || snapperSampleSent;
       reply.hidden = entry.scene !== "sample" || !snapperSampleSent;
+      vocabCard.hidden = entry.scene !== "vocab";
 
       if (!prefersReducedMotion && hasScene) {
         gsap.fromTo(
@@ -1714,6 +1736,22 @@
       }
     }
 
+    function restoreSnapperContactMode() {
+      if (!snapperBoxUnlockActive) {
+        return;
+      }
+
+      snapperBoxUnlockActive = false;
+      snapperBoxUnlockIndex = 0;
+
+      if (snapperDialogueIndex >= snapperDialogueScript.length - 1 || snapperUplinkVisible) {
+        showSnapperUplink();
+        return;
+      }
+
+      renderSnapperDialogue(snapperDialogueIndex, { instant: true });
+    }
+
     function skipSnapperIntro() {
       const character = document.querySelector("#snapper-character");
       const dialogue = document.querySelector("#snapper-dialogue-text") || document.querySelector("#snapper-dialogue");
@@ -1846,6 +1884,89 @@
       });
     }
 
+    function hideSnapperUplinkForDialogue() {
+      const conversation = document.querySelector(".snapper-conversation");
+      const uplink = document.querySelector("#snapper-uplink");
+      const skipButton = document.querySelector("#snapper-skip-button");
+
+      snapperUplinkVisible = false;
+
+      if (uplink) {
+        uplink.hidden = true;
+      }
+
+      if (conversation) {
+        conversation.classList.remove("is-uplink");
+      }
+
+      if (skipButton) {
+        skipButton.hidden = true;
+      }
+    }
+
+    function renderSnapperBoxUnlockDialogue(index, options = {}) {
+      const character = document.querySelector("#snapper-character");
+      const dialogue = document.querySelector("#snapper-dialogue-text") || document.querySelector("#snapper-dialogue");
+
+      if (!character || !dialogue || !snapperBoxUnlockScript.length) {
+        return;
+      }
+
+      snapperBoxUnlockIndex = Math.max(0, Math.min(index, snapperBoxUnlockScript.length - 1));
+      const entry = snapperBoxUnlockScript[snapperBoxUnlockIndex];
+      const text = entry.text;
+      const chars = Array.from(text);
+      character.src = entry.src;
+      updateSnapperScene(entry);
+      setSnapperCompletionGlyph(false);
+
+      if (snapperTextTween) {
+        snapperTextTween.kill();
+        snapperTextTween = null;
+      }
+
+      if (prefersReducedMotion || options.instant) {
+        dialogue.textContent = text;
+        setSnapperCompletionGlyph(true);
+        return;
+      }
+
+      dialogue.textContent = "";
+      gsap.fromTo(
+        character,
+        { y: 5, scale: 0.98 },
+        { y: 0, scale: 1, duration: 0.28, ease: "back.out(1.8)" },
+      );
+
+      const typing = { count: 0 };
+      snapperTextTween = gsap.to(typing, {
+        count: chars.length,
+        duration: Math.max(0.55, Math.min(2.2, chars.length * 0.028)),
+        ease: "none",
+        onUpdate() {
+          dialogue.textContent = chars.slice(0, Math.round(typing.count)).join("");
+        },
+        onComplete() {
+          dialogue.textContent = text;
+          snapperTextTween = null;
+          setSnapperCompletionGlyph(true);
+        },
+      });
+    }
+
+    function startSnapperBoxUnlockDialogue() {
+      if (snapperBoxUnlockStarted) {
+        return;
+      }
+
+      snapperBoxUnlockStarted = true;
+      snapperBoxUnlockActive = true;
+      snapperBoxUnlockIndex = 0;
+      hideSnapperUplinkForDialogue();
+      openWindow("snapper", { preserveSnapperMode: true });
+      renderSnapperBoxUnlockDialogue(0);
+    }
+
     function renderSnapperDialogue(index, options = {}) {
       const character = document.querySelector("#snapper-character");
       const dialogue = document.querySelector("#snapper-dialogue-text") || document.querySelector("#snapper-dialogue");
@@ -1901,6 +2022,26 @@
     }
 
     function advanceSnapperDialogue(step) {
+      if (snapperBoxUnlockActive) {
+        if (snapperTextTween) {
+          snapperTextTween.progress(1);
+          return;
+        }
+
+        if (step > 0 && snapperBoxUnlockIndex < snapperBoxUnlockScript.length - 1) {
+          renderSnapperBoxUnlockDialogue(snapperBoxUnlockIndex + step);
+          return;
+        }
+
+        if (step > 0) {
+          snapperBoxUnlockActive = false;
+          snapperDialogueIndex = snapperDialogueScript.length - 1;
+          showSnapperUplink();
+        }
+
+        return;
+      }
+
       if (snapperUplinkVisible) {
         return;
       }
@@ -1931,6 +2072,10 @@
     }
 
     function playSnapperDialogue() {
+      if (snapperBoxUnlockActive || snapperUplinkVisible) {
+        return;
+      }
+
       renderSnapperDialogue(snapperDialogueIndex);
     }
 
@@ -1938,6 +2083,7 @@
       const conversation = document.querySelector(".snapper-conversation");
       const sendButton = document.querySelector("#snapper-send-button");
       const skipButton = document.querySelector("#snapper-skip-button");
+      const vocabCard = document.querySelector("#snapper-vocab-card");
 
       if (!conversation || !sendButton) {
         return;
@@ -1959,6 +2105,13 @@
           advanceSnapperDialogue(1);
         }
       });
+
+      if (vocabCard) {
+        ["click", "pointerdown", "touchstart"].forEach((eventName) => {
+          vocabCard.addEventListener(eventName, (event) => event.stopPropagation());
+        });
+      }
+
       sendButton.addEventListener("click", (event) => {
         event.stopPropagation();
         snapperSampleSent = true;
@@ -1980,12 +2133,30 @@
       const answer = document.querySelector("#box-answer");
       const problemText = document.querySelector("#box-problem-text");
       const problemCount = document.querySelector("#box-problem-count");
+      const problemImage = document.querySelector("#box-problem-image");
       const result = document.querySelector("#box-result");
+      const access = document.querySelector("#box-access");
+      const boxBody = document.querySelector(".box-body");
       const keys = Array.from(document.querySelectorAll("[data-box-key], [data-box-action]"));
       const boxProblems = [
         {
-          prompt: "linoa furo eso",
-          answer: "furo",
+          prompt: "zoo sonya vose lidh\n○○○○",
+          answer: "fero",
+          image: "box-question-tree.png",
+          imageAlt: "青空の下に立つ大きな木",
+        },
+        {
+          prompt: "現在での開発はここまでです！\n全て実装するまでもう少しお待ちください",
+          answer: "",
+          image: "box-coming-soon-snapper.png",
+          imageAlt: "案内をするミヅキ",
+          imagePixel: true,
+          locked: true,
+          notice: true,
+        },
+        {
+          prompt: "linoa soa nyamophoa moph eso\n○○○○",
+          answer: "moph",
         },
         {
           prompt: "soa moph eso",
@@ -2001,9 +2172,48 @@
         },
       ];
       let currentProblemIndex = 0;
+      let isAwaitingBoxAdvance = false;
 
       function normalizeBoxAnswer(value) {
         return value.trim().replace(/\s+/g, " ");
+      }
+
+      function playBoxAccessAnimation() {
+        if (!access) {
+          return;
+        }
+
+        access.hidden = false;
+
+        if (prefersReducedMotion || !window.gsap) {
+          return;
+        }
+
+        const image = access.querySelector("img");
+        const label = access.querySelector("span");
+
+        gsap.killTweensOf([access, image, label]);
+        gsap.set(access, { autoAlpha: 0 });
+        gsap.set(image, { autoAlpha: 0, scale: 1.08 });
+        gsap.set(label, { autoAlpha: 0, y: 28, scale: 0.96 });
+
+        gsap.timeline({
+          defaults: { ease: "power2.out" },
+        })
+          .to(access, { autoAlpha: 1, duration: 0.12 })
+          .to(image, { autoAlpha: 1, scale: 1, duration: 0.42 }, "<")
+          .to(label, { autoAlpha: 1, y: 0, scale: 1, duration: 0.28, ease: "back.out(1.45)" }, "<0.08")
+          .to(label, { scale: 1.08, duration: 0.16, yoyo: true, repeat: 1 }, "+=0.18");
+      }
+
+      function advanceBoxProblem() {
+        if (!isAwaitingBoxAdvance) {
+          return;
+        }
+
+        isAwaitingBoxAdvance = false;
+        currentProblemIndex = (currentProblemIndex + 1) % boxProblems.length;
+        renderBoxProblem();
       }
 
       function renderBoxProblem() {
@@ -2011,6 +2221,14 @@
 
         if (problemText) {
           problemText.textContent = problem.prompt;
+          problemText.classList.toggle("is-notice", Boolean(problem.notice));
+        }
+
+        if (problemImage) {
+          problemImage.hidden = !problem.image;
+          problemImage.src = problem.image || "";
+          problemImage.alt = problem.imageAlt || "";
+          problemImage.classList.toggle("is-pixel", Boolean(problem.imagePixel));
         }
 
         if (problemCount) {
@@ -2018,15 +2236,33 @@
         }
 
         answer.textContent = "";
+        isAwaitingBoxAdvance = false;
+
+        if (boxBody) {
+          boxBody.classList.toggle("is-box-locked", Boolean(problem.locked));
+        }
+
+        keys.forEach((button) => {
+          button.disabled = Boolean(problem.locked);
+        });
 
         if (result) {
           result.textContent = "";
           result.classList.remove("is-correct", "is-wrong");
         }
+
+        if (access) {
+          access.hidden = true;
+        }
       }
 
       function judgeBoxAnswer() {
         const problem = boxProblems[currentProblemIndex];
+
+        if (problem.locked) {
+          return;
+        }
+
         const isCorrect = normalizeBoxAnswer(answer.textContent) === problem.answer;
 
         if (result) {
@@ -2039,10 +2275,12 @@
           return;
         }
 
-        window.setTimeout(() => {
-          currentProblemIndex = (currentProblemIndex + 1) % boxProblems.length;
-          renderBoxProblem();
-        }, 620);
+        isAwaitingBoxAdvance = true;
+        playBoxAccessAnimation();
+
+        if (currentProblemIndex === 0) {
+          window.setTimeout(startSnapperBoxUnlockDialogue, 680);
+        }
       }
 
       if (!answer || !keys.length || !boxProblems.length) {
@@ -2051,9 +2289,20 @@
 
       renderBoxProblem();
 
+      if (access) {
+        access.addEventListener("click", (event) => {
+          event.stopPropagation();
+          advanceBoxProblem();
+        });
+      }
+
       keys.forEach((button) => {
         button.addEventListener("click", (event) => {
           event.stopPropagation();
+
+          if (isAwaitingBoxAdvance) {
+            return;
+          }
 
           if (button.dataset.boxAction === "backspace") {
             answer.textContent = answer.textContent.slice(0, -1);

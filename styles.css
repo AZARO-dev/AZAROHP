@@ -748,6 +748,7 @@ button {
 .snapper-sample-card[hidden],
 .snapper-send-button[hidden],
 .snapper-alien-reply[hidden],
+.snapper-vocab-card[hidden],
 .snapper-uplink[hidden],
 .snapper-uplink-image[hidden],
 .snapper-loading[hidden],
@@ -867,6 +868,53 @@ button {
   font-size: 1.18rem;
   line-height: 1.1;
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.22);
+}
+
+.snapper-vocab-card {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  padding: 10px;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+  touch-action: pan-y;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 44%),
+    rgba(0, 0, 0, 0.72);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 14px 28px rgba(0, 0, 0, 0.28);
+}
+
+.snapper-vocab-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.snapper-vocab-card th,
+.snapper-vocab-card td {
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-weight: 400;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.snapper-vocab-card th {
+  width: 48%;
+  font-family: "Madoufmg", "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.snapper-vocab-card td {
+  font-family: "Soo", serif;
+  font-size: 1.08rem;
+  text-shadow: 0 0 9px rgba(255, 255, 255, 0.2);
 }
 
 .snapper-uplink {
@@ -1171,6 +1219,7 @@ button {
 }
 
 .box-body {
+  position: relative;
   display: grid;
   grid-template-rows: minmax(210px, 1fr) minmax(250px, 1.12fr);
   gap: 12px;
@@ -1196,7 +1245,7 @@ button {
 
 .box-problem {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 10px;
   place-items: center;
   padding: 18px;
@@ -1223,6 +1272,52 @@ button {
   text-shadow:
     0 0 13px rgba(255, 255, 255, 0.24),
     0 8px 18px rgba(0, 0, 0, 0.5);
+}
+
+.box-problem-text.is-notice {
+  max-width: 22em;
+  font-family: "Madoufmg", "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: clamp(0.82rem, 2.1vw, 1.06rem);
+  line-height: 1.58;
+}
+
+.box-problem-image {
+  display: block;
+  width: min(100%, 360px);
+  height: 100%;
+  min-height: 0;
+  max-height: 122px;
+  object-fit: contain;
+  object-position: center;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: calc(var(--radius) - 2px);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.box-problem-image.is-pixel {
+  width: min(100%, 320px);
+  max-height: 152px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  image-rendering: pixelated;
+}
+
+.box-problem-image[hidden] {
+  display: none;
+}
+
+.box-body.is-box-locked .box-keyboard {
+  opacity: 0.44;
+}
+
+.box-body.is-box-locked .box-answer::before {
+  content: "";
 }
 
 .box-keyboard {
@@ -1311,6 +1406,71 @@ button {
 .box-key-command {
   font-family: "Madoufmg", "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif !important;
   font-size: 0.68rem !important;
+}
+
+.box-access {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  overflow: hidden;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.46)),
+    #050505;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.box-access[hidden] {
+  display: none;
+}
+
+.box-access::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  height: 58%;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.48) 42%, transparent 100%);
+  pointer-events: none;
+}
+
+.box-access img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  image-rendering: pixelated;
+  filter:
+    contrast(1.06)
+    drop-shadow(0 0 20px rgba(255, 255, 255, 0.16));
+}
+
+.box-access span {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 50%;
+  padding: 64px 24px 24px;
+  color: #ffffff;
+  font-family: "Madoufmg", "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: clamp(1.4rem, 8vw, 3.4rem);
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-align: center;
+  text-shadow:
+    0 0 14px rgba(255, 255, 255, 0.38),
+    0 8px 18px rgba(0, 0, 0, 0.62);
 }
 
 .window-actions {
@@ -2066,6 +2226,18 @@ body[data-error="gsap"]::before {
     left: 28px;
     padding: 7px 8px;
     font-size: 1rem;
+  }
+
+  .snapper-vocab-card {
+    padding: 8px;
+  }
+
+  .snapper-vocab-card th {
+    font-size: 0.64rem;
+  }
+
+  .snapper-vocab-card td {
+    font-size: 0.94rem;
   }
 
   .snapper-uplink {

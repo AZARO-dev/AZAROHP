@@ -94,7 +94,15 @@
         <div class="window-body notes-body">
           <label for="readme-text">README.md</label>
           <textarea id="readme-text" spellcheck="false">あげまきあざろのホームページ。
-作成したものをならべます。</textarea>
+作成したものをならべます。
+
+更新履歴
+
+2026-08-10
+・サイトを開設しました。
+
+2026-08-14
+・ミヅキのCONTACTウィンドウと、BOXのミニゲームを実装しました。</textarea>
         </div>
       </section>
 
@@ -142,6 +150,19 @@
                 <span>[送信]</span>
               </button>
               <p class="snapper-alien-reply" id="snapper-alien-reply" hidden>vose linoa furo eso</p>
+              <div class="snapper-vocab-card" id="snapper-vocab-card" hidden>
+                <table>
+                  <tbody>
+                    <tr><th>草</th><td>furo</td></tr>
+                    <tr><th>木</th><td>fero</td></tr>
+                    <tr><th>私</th><td>senya</td></tr>
+                    <tr><th>あなた</th><td>sonya</td></tr>
+                    <tr><th>疑問詞</th><td>zoo</td></tr>
+                    <tr><th>何</th><td>zoso</td></tr>
+                    <tr><th>～と～</th><td>viva</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
             <div class="snapper-uplink" id="snapper-uplink" hidden aria-label="星間通信">
               <div class="snapper-uplink-preview" id="snapper-uplink-preview">
@@ -190,6 +211,7 @@
         <div class="window-body box-body">
           <section class="box-problem" aria-label="Soo problem text">
             <p class="box-problem-count" id="box-problem-count">01 / 04</p>
+            <img class="box-problem-image" id="box-problem-image" src="" alt="" hidden>
             <p class="box-problem-text" id="box-problem-text">linoa furo eso</p>
           </section>
           <section class="box-keyboard" aria-label="Soo keyboard">
@@ -219,6 +241,10 @@
               <button class="box-key-command" type="button" data-box-action="enter" aria-label="Enter">↵</button>
             </div>
           </section>
+          <div class="box-access" id="box-access" hidden aria-hidden="true">
+            <img src="snapper-access.png" alt="">
+            <span>SUCCESS</span>
+          </div>
         </div>
       </section>
 
